@@ -123,11 +123,7 @@ function removeElm() {
 	$(".demo").delegate(".remove", "click", function(e) {
 		var uid = $(this).parent().find('.view').children().attr("id");
 		if(typeof(uid)!='undefined'){
-			if(uid.indexOf("ui") >= 0 || uid.indexOf("fs") >= 0 || uid.indexOf("hc") >= 0
-					|| uid.indexOf("ctr") >= 0 || uid.indexOf("sec") >= 0|| uid.indexOf("cam") >= 0
-					|| uid.indexOf("page") >= 0 || uid.indexOf("layout") >= 0){//控件中的<div id>属性是否存在 
 				delete uiTemplateObj[uid];
-			}
 		}
 		e.preventDefault();
 		$(this).parent().remove();
@@ -301,12 +297,8 @@ $(document).ready(function() {
 			handleJsIds();
 			var uid = t.helper.children(".view").children().attr("id");
 			if(typeof(uid)!='undefined'){//控件中的<div id>属性是否存在 
-				if(uid.indexOf("fs") >= 0 || uid.indexOf("hc") >= 0 
-					|| uid.indexOf("ctr") >= 0 || uid.indexOf("sec") >= 0|| uid.indexOf("cam") >= 0
-					|| uid.indexOf("page") >= 0){//自定义ui控件
-					var ui = gUiObject[uid].create();//根据拖动的控件创建对象
-					uiTemplateObj[ui.properties.tid] = ui.properties;//将拖动后创建的控件ID、属性进行缓存
-				}
+				var ui = gUiObject[uid].create();//根据拖动的控件创建对象
+				uiTemplateObj[ui.properties.tid] = ui.properties;//将拖动后创建的控件ID、属性进行缓存
 			}
 			if(stopsave>0) stopsave--;
 			startdrag = 0;
@@ -321,16 +313,6 @@ $(document).ready(function() {
 		contenthandle.setData(eText);
 	});
 
-	//开关类控件按键触发
-	$(".switch_button").click(function(){
-		var src = $(this).attr("src");
-		if(src.indexOf("off") >=0 ){
-	      $(this).attr("src","img/on.png");
-	    }
-	    else{
-	      $(this).attr("src","img/off.png");
-	    }
-	});
 
 	<!--控件属性编辑--> 
 	$('body.edit .demo').on("click","[data-target=#attrEditorModal]",function(e) {
@@ -361,12 +343,13 @@ $(document).ready(function() {
 
 		//根据新属性更新控件样式
 		$(".widgetAttrChange").change(function(){
-			/*先更新id，再从缓存中删除原id、属性*/
-	        new_uid = uid.substring(0,placeOfChar(uid,2,'_')+1) + randomNumber();
-	        $("#"+uid).attr("id",new_uid);  
-	        delete uiTemplateObj[uid];//删除原控件属性记录
-	        uid = new_uid;
-
+			//如果是节点类型更换则特殊处理
+			if($(this).attr("id") == "node_type")//生成新的mac地址
+			{
+				var node_type = $(this).val();
+				var mac = makeMacAddr(node_type);
+				$("#sensor_mac").val(mac);
+			}
 			var ui = gUiObject[widgetIndex].updateAttr(uid);//动态更新控件显示
 			uiTemplateObj[ui.properties.tid] = ui.properties;//将拖动后创建的控件ID、属性进行缓存			
 		});

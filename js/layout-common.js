@@ -1,24 +1,12 @@
 <!--定义全局变量 key:object--> 
 var gUiObject = {
-	"fs_temperature": fs_temperature,
-	"hc_dial": hc_dial,
-	"fs_dial": fs_dial,
-	"fs_cup": fs_cup,
-	"hc_curve": hc_curve,
-	"layout_subsys": layout_subsys,
-	"ctr_switch": ctr_switch,
-	"sec_alarm": sec_alarm,
-	"cam_video": cam_video,
-	"page_header": page_header,
-	"page_footer": page_footer
+	"temperature": temperature,
 };
 /*恢复控件的UI内容*/
 function resumeWidgetUI(temObj){
 	for(var i in temObj){
-		if(i.indexOf("layout") < 0 ){//若是布局控件则忽略此次操作
-			var widgetJSFileName = i.substring(0,placeOfChar(i,2,'_'));	
-			gUiObject[widgetJSFileName].create(temObj[i]);			
-		}
+		var widgetJSFileName = i.substring(0,placeOfChar(i,1,'_'));	
+		gUiObject[widgetJSFileName].create(temObj[i]);			
 	}	
 }
 
@@ -29,12 +17,12 @@ function htmlCompress(html){
   
 function initTemplateUI(layoutJSON,content){
 	   //保存控件UI属性配置数据
-	   if(layoutJSON != 'JSON'){//判断数据是否为空
+	   if(layoutJSON != null){//判断数据是否为空
 		   uiTemplateObj = JSON.parse(layoutJSON);
 	   }
 	     
 	   //渲染控件布局的div
-	   if(content !='CONTENT'){
+	   if(content != null){
 		   $(".demo").html(content);
 	   }
 	     

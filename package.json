@@ -1,9 +1,8 @@
 {
   "name": "firstApp",
   "version": "0.1.0",
-  "main": "index.html",
+  "main": "main.html",
   "dependencies": {
-    "socket.io": "^1.4.6",
     "websocket.io": "^0.2.1"
   }
 }
