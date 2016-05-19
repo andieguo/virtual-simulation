@@ -1,26 +1,19 @@
-function remoteTCP(){ 
+var tcp_client;
+
+function remoteTCP(uid,ukey,serverAddr){ 
   var net = require('net');                    
   var client = new net.Socket();
-
   client.setEncoding("utf8");
 
-  var serverAddr = "zhiyun360.com";
+  tcp_client = client;
+
   var port = 28082;
 
-  var ZCloudID = '1155223953';
-  var ZCloudKey = 'Xrk6UicNrbo3KiX1tYDDaUq9HAMHBYhuE2Sb4NLKFKdNcLH5';
-
-  var auth_info = '{\"method\":\"authenticate\",\"uid\":\"'+ZCloudID+'\",\"key\":\"'+ZCloudKey+'\",\"version\":\"0.1.0\",\"autodb\":true}';
-
-  var msg = '{"method":"sensor", "addr":"22:22:33:44:55:66:77:88", "data":"{A0=3.3,A1=3}"}';
+  var auth_info = '{\"method\":\"authenticate\",\"uid\":\"'+uid+'\",\"key\":\"'+ukey+'\",\"version\":\"0.1.0\",\"autodb\":true}';
 
   client.connect(port,serverAddr,function(){
     console.log('Connected to Server.');
     client.write(auth_info);
-    setInterval(function(){
-      client.write(msg);
-      console.log("send the data to app.");
-    },2000);
   });
 
   client.on("close",function(){
@@ -28,6 +21,23 @@ function remoteTCP(){
   });
   
   client.on("data",function(data){
-    console.log("From Server:"+data);
+    //dat = JSON.parse(data);
+    var method = data.substring(data.indexOf("method")+9);
+    method = method.substring(0,method.indexOf("\""));
+
+    if(method =="control"){
+      var addr = data.substring(data.indexOf("addr")+7);
+      addr = addr.substring(0,addr.indexOf("\""));
+
+      var dat = data.substring(data.indexOf("data")+7);
+      dat = dat.substring(0,dat.indexOf("\""));
+      onMessageArrive(addr,dat);//消息回调
+     }
   });
+}
+
+function remoteSendData(mac,data){
+  var msg = {"method":"sensor", "addr":mac, "data":"{A0="+data+"}"};
+  msg = JSON.stringify(msg);
+  tcp_client.write(msg);
 }

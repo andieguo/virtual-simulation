@@ -59,6 +59,8 @@
 var uiTemplateObj;
 var hardwareTag=0;
 var sensorIntervalObj={};//缓存传感器的定时器信息
+var localServiceTag=0;  //标记本地服务开启状态
+var remoteServiceTag=0;  //标记远程服务开启状态
 //从本地文件中读取配置信息
 var fs=require('fs');
 var obj=JSON.parse(fs.readFileSync('./sensor_config.json'));
@@ -71,16 +73,23 @@ function initTemplateObj(){
 
 //虚拟硬件开始工作
 function hardwareOn(btObj,divid){
-  var s_prop = JSON.parse(sensor_prop);
   var cmd = btObj.val();
 
   if(cmd == "ON"){//开启传感器电源
     sensorIntervalObj[divid] =setInterval(function(){
-      pushSensorData(s_prop[divid].mac);
-    },parseInt(s_prop[divid].interval)*500);
+      uiTemplateObj[divid].power = "on";
+      var range = {"min":uiTemplateObj[divid].min_value,"max":uiTemplateObj[divid].max_value};
+      var data = makeSensorData(uiTemplateObj[divid].data_policy,range);
+      pushSensorData(uiTemplateObj[divid].mac,data);
+
+      //传感器显示实时数据
+      $("#"+divid).find(".t_value").text(data);
+    },parseInt(uiTemplateObj[divid].interval)*1000);
+
     btObj.val("OFF");
   }
   else{//关闭传感器电源
+    uiTemplateObj[divid].power = "off";
     clearInterval(sensorIntervalObj[divid]);
     btObj.val("ON");
   }
@@ -90,7 +99,7 @@ function hardwareOn(btObj,divid){
 //文档就绪
 $(function(){
   initTemplateObj();
-  initTemplateUI(sensor_prop,sensor_html);
+  initTemplateUI(sensor_prop,sensor_html);//传感器UI渲染
 
   $("#bt_edithd").click(function(){
     window.location.href="./edit.html";
@@ -103,10 +112,13 @@ $(function(){
       var zcloudId = $("#userId").val();
       var zcloudKey = $("#userKey").val();
       localWebsocket(zcloudId,zcloudKey);
+      localTCP(zcloudId,zcloudKey);
+      localServiceTag = 1;
       $(this).val("关闭");
       $("#label_ls").text("已启动");
     }
     else{//关闭
+      localServiceTag = 0;
       $(this).val("开启");
       $("#label_ls").text("已停止");
     }
@@ -115,9 +127,22 @@ $(function(){
 
   //远程服务点击事件
   $("#bt_remoteService").click(function(){
-    var zcloudId = $("#userId").val();
-    var zcloudKey = $("#userKey").val();
-    var serverAddr = $("#serverAddr").val();
+    var cmd = $(this).val();
+    if(cmd == '启动'){
+      var zcloudId = $("#userId").val();
+      var zcloudKey = $("#userKey").val();
+      var serverAddr = $("#serverAddr").val();
+      remoteTCP(zcloudId,zcloudKey,serverAddr);
+      remoteServiceTag =1;
+      $(this).val("关闭");
+      $("#label_rs").text("已启动");
+    }
+    else{//关闭
+      remoteServiceTag = 0;
+      $(this).val("开启");
+      $("#label_rs").text("已停止");
+    }
+
   });
 
   //传感器电源开关点击事件
@@ -126,6 +151,36 @@ $(function(){
     var divid = $(this).parents(".view").children().attr("id");
     hardwareOn(clickObj,divid);
   });
+
+  //接收、处理上层发送的指令
+  onMessageArrive = function(mac,dat){
+    //console.log("mac:"+mac+",data:"+dat);
+    for(var i in uiTemplateObj){
+      if(uiTemplateObj[i].mac == mac){
+        var sensorId = uiTemplateObj[i].tid;
+        var sensor = sensorId.substring(0,sensorId.indexOf('_'));
+
+        var data = dat;
+        var chan,val;
+        while(1){
+          if(data.indexOf(',') == -1)
+          {
+            chan = data.substring(data.indexOf('{')+1,data.indexOf('='));
+            val = data.substring(data.indexOf('=')+1,data.indexOf('}'));
+            gUiObject[sensor].messageArrive(sensorId,chan,val);//交给传感器处理
+            break;
+          }
+          else{
+            chan = data.substring(data.indexOf('{')+1,data.indexOf('='));
+            val = data.substring(data.indexOf('=')+1,data.indexOf(','));
+            gUiObject[sensor].messageArrive(sensorId,chan,val);//交给传感器处理
+            data = "{"+data.substring(data.indexOf(',')+1);
+          }
+        }
+        break;
+      }
+    }
+  }
 });
 </script>
 </head>

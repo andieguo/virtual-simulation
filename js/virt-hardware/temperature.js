@@ -73,7 +73,8 @@ var temperature = {
         node_type:"ZigBee",
         data_policy:"data_random",
         min_value:-10.0,
-        max_value:60.0
+        max_value:60.0,
+        power:"off"
     };
 
     //将create()输入的属性参数绘制控件UI
@@ -117,61 +118,41 @@ var temperature = {
           node_type:node_type,
           data_policy:data_policy,
           min_value:parseFloat(min_value),
-          max_value:parseFloat(max_value)
+          max_value:parseFloat(max_value),
+          power:"off"
       };
       
       var ui = new TemperatureUI(properties);
       return ui;
   },
 
-  //设置报警器的状态、布防撤防的状态
-  setValue:function(divid,chan,val){
-    //模拟量0/1
-    var reg1 = /^.*A[0-7].*$/;
-    if(reg1.test(chan)){
-        if(val == 0){//正常状态
-          $("#"+divid).find("img").attr("src",layoutitPath+"images/alarm-on.png");
-          $("#"+divid).find("audio").attr("src","#");
-          $("#"+divid).find("#alarm_text").text("已布防，正在检测...");
-          $("#"+divid).find("#alarm_text").css("color","blue");
-        }
-        if(val == 1){//报警状态
-          $("#"+divid).find("img").attr("src",layoutitPath+"images/alarm-activ.gif");
-          $("#"+divid).find("audio").attr("src",layoutitPath+"audio/alarm.mp3");
-          $("#"+divid).find("#alarm_text").text("检测到异常！");
-          $("#"+divid).find("#alarm_text").css("color","red");
-        }
-    }
+  messageArrive:function(divid,chan,val){//{A0=?,V0=20}、{A0=?}、{v0=20}
+    if(uiTemplateObj[divid].power == "off") return;
     
-    //开关量
-    var reg2 = /^.*D[0-3].*$/;
-    if(reg2.test(chan)){
-        if(val == 0){//已撤防
-          $("#"+divid).find("img").attr("src",layoutitPath+"images/alarm-off.png");
-          $("#"+divid).find("#alarm_text").text("已撤防");
-          $("#"+divid).find("#alarm_text").css("color","black");
-        }
-        if(val == 1){//布防
-          $("#"+divid).find("img").attr("src",layoutitPath+"images/alarm-on.png");
-          $("#"+divid).find("#alarm_text").text("已布防，正在检测...");
-          $("#"+divid).find("#alarm_text").css("color","blue");
-        }        
-    }
+    if(chan == "A0" && val =='?'){
+      var range = {"min":uiTemplateObj[divid].min_value,"max":uiTemplateObj[divid].max_value};
+      var data = makeSensorData(uiTemplateObj[divid].data_policy,range);
+      pushSensorData(uiTemplateObj[divid].mac,data);
 
-  },
-
-  sendCmd:function(clickObj,rtcObj,dataObj){
-    var text = clickObj.text();
-    console.log(text);
-    if(text == "布防"){
-      //发送布防指令
-      console.log(dataObj.mac+" -> "+dataObj.command.open);
-      rtcObj.sendMessage(dataObj.mac, dataObj.command.open);
+      //传感器显示实时数据
+      $("#"+divid).find(".t_value").text(data);
     }
-    else{
-      //发送撤防指令
-      console.log(dataObj.mac+" -> "+dataObj.command.close);
-      rtcObj.sendMessage(dataObj.mac, dataObj.command.close);
+    if(chan == "D0" && val =='?'){
+
+    }
+    if(chan == "OD0" && val =='1'){
+
+    }
+    if(chan == "CD0" && val =='1'){
+
+    }
+    if(chan == "V0"){
+      if(val =='?'){
+
+      }
+      else{
+        val = parseInt(val);
+      }
     }
   }
 }

@@ -1,24 +1,40 @@
-function localTCP(){
-	var net = require('net');
+var tcp_list=[];
 
+function localTCP(uid,ukey){
+	var net = require('net');
 	var server = net.createServer();
 
-	var msg = '{"method":"message", "addr":"22:22:33:44:55:66:77:88", "data":"{A0=3.3,A1=3}"}';
-
 	server.on("connection",function(socket){
-		console.log("new connection");
-		
 		socket.setEncoding("utf8");
 		socket.on("data",function(data){
-			console.log("From Client:"+data);
-		});
-		setInterval(function(){
-			socket.write(msg);
-		},2000);
-		
+			var dat = JSON.parse(data);
+			if(dat.method =="control"){
+				onMessageArrive(dat.addr,dat.data);//消息回调
+			}
+			if(dat.method =="authenticate"){
+				if(dat.uid == uid && dat.key == ukey){//ID、key验证
+					tcp_list.push(socket);
+				}
+				else{//验证错误，断开连接
+					socket.end();
+				}
+			}			
+		});		
 	});
 
 	server.listen(28081,function(){
 		console.log("server is listening");
 	});
+}
+
+function tcpSendData(mac,data){
+	var msg = {"method":"message", "addr":mac, "data":"{A0="+data+"}"};
+	msg = JSON.stringify(msg);
+
+	var len = tcp_list.length;
+	if(len>0){
+		for(var i in tcp_list){
+			tcp_list[i].write(msg);
+		}
+	}
 }

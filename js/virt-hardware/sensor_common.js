@@ -1,3 +1,5 @@
+var onMessageArrive;//消息到达回调函数
+
 //自动生成MAC地址
 function makeMacAddr(node_type){
 	if(node_type == "ZigBee"){//zigbee
@@ -53,16 +55,30 @@ function makeRandom0F(n){
 	return num;
 }
 
-//推送数据
-function pushSensorData(mac){
-	var data = Math.floor(Math.random()*60);
-	var msg = {"method":"message", "addr":mac, "data":"{A0="+data+"}"};
-
-	var len = ws_list.length;
-	if(len>0){
-		for(var i in ws_list){
-			ws_list[i].send(JSON.stringify(msg));
-		}
+//传感器数据生成策略
+function makeSensorData(policy,range){
+	switch(policy){
+		case "data_random":
+			return makeRangeRandNum(range.min,range.max);
+		default:
+			return 0;
 	}
+}
 
+//传感器生成任意区间随机数
+function makeRangeRandNum(low,high){
+	var r=high-low+1;
+	return Math.floor(Math.random()*r+low);
+}
+
+//推送数据
+function pushSensorData(mac,data){
+	if(localServiceTag){
+		wsSendData(mac,data);//websocket发送数据
+		tcpSendData(mac,data);
+	}
+	if(remoteServiceTag){
+		remoteSendData(mac,data);
+	}
+	
 }

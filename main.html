@@ -36,7 +36,7 @@
   var fs=require('fs');
   //fs.writeFileSync('./output.json',JSON.stringify({a:1,b:2}));
   var Obj=JSON.parse(fs.readFileSync('./sensor_config.json'));
-  if(Obj.sensor_prop != null){
+  if(Obj.sensor_prop != null && Obj.sensor_prop !="{}"){
     window.location.href="./index.html"
   }
   $(function(){
