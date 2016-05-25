@@ -37,7 +37,7 @@ function remoteTCP(uid,ukey,serverAddr){
 }
 
 function remoteSendData(mac,data){
-  var msg = {"method":"sensor", "addr":mac, "data":"{A0="+data+"}"};
+  var msg = {"method":"sensor", "addr":mac, "data":data};
   msg = JSON.stringify(msg);
   tcp_client.write(msg);
 }

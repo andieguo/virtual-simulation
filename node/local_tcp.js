@@ -28,7 +28,7 @@ function localTCP(uid,ukey){
 }
 
 function tcpSendData(mac,data){
-	var msg = {"method":"message", "addr":mac, "data":"{A0="+data+"}"};
+	var msg = {"method":"message", "addr":mac, "data":data};
 	msg = JSON.stringify(msg);
 
 	var len = tcp_list.length;

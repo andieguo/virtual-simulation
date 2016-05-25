@@ -31,7 +31,7 @@ function localWebsocket(uid,ukey){
 }
 
 function wsSendData(mac,data){
-	var msg = {"method":"message", "addr":mac, "data":"{A0="+data+"}"};
+	var msg = {"method":"message", "addr":mac, "data":data};
 	msg = JSON.stringify(msg);
 
 	var len = ws_list.length;

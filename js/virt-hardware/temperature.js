@@ -34,6 +34,13 @@ var temperature = {
                         '<input class="w200p widgetAttrChange" id="sensor_mac" type="text" disabled="true ">' +
                       '</div><br>' +
                       '<div class="input-prepend mr10p">' +
+                        '<span class="add-on">上报开关</span>' +
+                        '<select class="w50p widgetAttrChange" id="update_sw">' +
+                            '<option value="1" selected="selected">开</option>' +
+                            '<option value="0">关</option>' +
+                        '</select>' +
+                      '</div>' + 
+                      '<div class="input-prepend mr10p">' +
                         '<span class="add-on">设定上报间隔</span>' +
                         '<input class="w50p widgetAttrChange" id="update_time" type="text">' +
                       '</div>' +
@@ -69,7 +76,8 @@ var temperature = {
         tid: "temperature",
         title:"温度传感器",
         mac:makeMacAddr("ZigBee"),
-        interval:30,
+        V0:30,
+        D0:1,
         node_type:"ZigBee",
         data_policy:"data_random",
         min_value:-10.0,
@@ -96,14 +104,15 @@ var temperature = {
   showAttr: function(properties){
       $("#sensor_title").val(properties.title);
       $("#sensor_mac").val(properties.mac);
-      $("#update_time").val(properties.interval);
+      $("#update_time").val(properties.V0);
       $("#min_value").val(properties.min_value);
-      $("#max_value").val(properties.max_value);  
+      $("#max_value").val(properties.max_value); 
   },
 
   updateAttr: function(divid){
       var title = $("#sensor_title").val();
       var mac = $("#sensor_mac").val();
+      var update_sw = $("#update_sw").val();
       var interval = $("#update_time").val();
       var node_type = $("#node_type").val();
       var data_policy = $("#data_policy").val();
@@ -114,7 +123,8 @@ var temperature = {
           tid: divid,
           title:title,
           mac:mac,
-          interval:interval,
+          V0:parseInt(interval),
+          D0:parseInt(update_sw),
           node_type:node_type,
           data_policy:data_policy,
           min_value:parseFloat(min_value),
@@ -126,32 +136,71 @@ var temperature = {
       return ui;
   },
 
+  updateData:function(divid){
+      var range = {"min":uiTemplateObj[divid].min_value,"max":uiTemplateObj[divid].max_value};
+      var val = makeSensorData(uiTemplateObj[divid].data_policy,range);      
+      //传感器显示实时数据
+      $("#"+divid).find(".t_value").text(val);
+
+      var data = "{A0="+val+"}";
+      pushSensorData(uiTemplateObj[divid].mac,data);//推送数据给订阅者
+  },
+
+  updateD0:function(divid,val){//更新上报状态
+    if(val){//开启上报
+      if(uiTemplateObj[divid].D0 != 1){
+        uiTemplateObj[divid].D0 = 1;
+        sensorIntervalObj[divid] =setInterval(function(){//开启定时器
+          temperature.updateData(divid);
+        },(uiTemplateObj[divid].V0)*1000);
+      }
+    }
+    else{//关闭上报
+      if(uiTemplateObj[divid].D0 != 0){
+        uiTemplateObj[divid].D0 = 0;
+        clearInterval(sensorIntervalObj[divid]);//清除定时器
+      }
+    }
+  },
+
+  updateV0:function(divid,val){//更新上报间隔
+    if(uiTemplateObj[divid].D0){
+      clearInterval(sensorIntervalObj[divid]);//清除原定时器
+
+      uiTemplateObj[divid].V0 = val;
+      sensorIntervalObj[divid] =setInterval(function(){//开启定时器
+        temperature.updateData(divid);
+      },val*1000);
+    }
+
+    //传感器控件显示
+    $("#"+divid).find(".t_interval").val(val);
+  },
+
   messageArrive:function(divid,chan,val){//{A0=?,V0=20}、{A0=?}、{v0=20}
     if(uiTemplateObj[divid].power == "off") return;
     
     if(chan == "A0" && val =='?'){
-      var range = {"min":uiTemplateObj[divid].min_value,"max":uiTemplateObj[divid].max_value};
-      var data = makeSensorData(uiTemplateObj[divid].data_policy,range);
-      pushSensorData(uiTemplateObj[divid].mac,data);
-
-      //传感器显示实时数据
-      $("#"+divid).find(".t_value").text(data);
+      temperature.updateData(divid);
     }
     if(chan == "D0" && val =='?'){
-
+        var data = "{D0=1}";
+        pushSensorData(uiTemplateObj[divid].mac,data);//推送数据给订阅者
     }
     if(chan == "OD0" && val =='1'){
-
+      temperature.updateD0(divid,1);
     }
     if(chan == "CD0" && val =='1'){
-
+      temperature.updateD0(divid,0);
     }
     if(chan == "V0"){
       if(val =='?'){
-
+        var  interval = uiTemplateObj[divid].V0;      
+        var data = "{V0="+interval+"}";
+        pushSensorData(uiTemplateObj[divid].mac,data);//推送数据给订阅者
       }
       else{
-        val = parseInt(val);
+        temperature.updateV0(divid,parseInt(val));
       }
     }
   }
@@ -170,7 +219,7 @@ function TemperatureUI(prop)
                       '<input type="button" value="DOWN">'+
                   '</div>'+
                   '<div>'+
-                      '当前温度：<span class="t_value">0</span>℃  上报间隔:<span class="t_interval">'+prop.interval+'</span>'+
+                      '当前温度：<span class="t_value">0</span>℃  上报间隔:<span class="t_interval">'+prop.V0+'</span>'+
                   '</div>'+
                   '<div class="node_type">'+prop.node_type+'</div>'+
               '</div>';
