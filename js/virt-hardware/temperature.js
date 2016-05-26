@@ -5,19 +5,23 @@ var temperature = {
                  '<div class="preview">温度传感器</div>' +
                  '<div class="view">' +
                     '<div class="panel-sensor" id="temperature">'+
-                        '<h3 class="title">温度传感器标题</h3>'+
+                        '<h3 class="title">'+
+                          '温度传感器标题'+
+                          '<div class="right">MAC地址：<span class="mac">11:22:33:44:55:66:77:88</span></div>'+
+                        '</h3>'+
                         '<div class="body">'+
-                            '<div>MAC地址：<span class="mac">11:22:33:44:55:66:77:88</span></div>'+
-                            '<img src="images/sensor/temperature.jpg" alt="">'+
-                            '<div>'+
-                                '<input type="button" class="power_switch" value="ON">'+
-                                '<input type="button" value="UP">'+
-                                '<input type="button" value="DOWN">'+
-                            '</div>'+
-                            '<div>'+
-                                '当前温度：<span class="t_value">32</span>℃  上报间隔:<span class="t_interval">30</span>'+
-                            '</div>'+
-                            '<div class="node_type">ZigBee</div>'+
+                          '<img class="img" src="images/sensor/temperature.jpg" alt="">'+
+                          '<div class="button">'+
+                            '<input class="power_switch btn-power" type="image" value="ON" src="images/power-on.png">'+
+                            '<input class="btn-data" type="button" value="UP">'+
+                            '<input class="btn-data" type="button" value="DOWN">'+
+                            '<input class="btn-data" type="button" value="数据策略">'+
+                          '</div>'+
+                          '<div class="value">'+
+                            '当前温度：<span class="t_value">0</span>℃&nbsp;&nbsp;'+
+                            '上报间隔:<span class="t_interval">30</span>&nbsp;&nbsp;'+
+                            '<span class="node_type">ZigBee</span>'+
+                          '</div>'+
                         '</div>'+
                     '</div>'+
                  '</div>'+
@@ -209,19 +213,21 @@ var temperature = {
 function TemperatureUI(prop)
 {
 	this.properties = prop;
-	var html =  '<h3 class="title">'+prop.title+'</h3>'+
+	var html =  '<h3 class="title">'+
+                prop.title+
+                '<div class="right">MAC地址：<span class="mac">'+prop.mac+'</span></div>'+
+              '</h3>'+
               '<div class="body">'+
-                  '<div>MAC地址：<span class="mac">'+prop.mac+'</span></div>'+
-                  '<img src="images/sensor/temperature.jpg" alt="">'+
-                  '<div>'+
-                      '<input type="button" class="power_switch" value="ON">'+
-                      '<input type="button" value="UP">'+
-                      '<input type="button" value="DOWN">'+
-                  '</div>'+
-                  '<div>'+
-                      '当前温度：<span class="t_value">0</span>℃  上报间隔:<span class="t_interval">'+prop.V0+'</span>'+
-                  '</div>'+
-                  '<div class="node_type">'+prop.node_type+'</div>'+
+                '<img class="img" src="images/sensor/temperature.jpg" alt="">'+
+                '<div class="button">'+
+                  '<input class="power_switch btn-power" type="image" value="ON" src="images/power-on.png">'+
+                  '<input class="btn-data" type="button" value="UP">'+
+                  '<input class="btn-data" type="button" value="DOWN">'+
+                  '<input class="btn-data" type="button" value="数据策略">'+
+                '</div>'+
+                '<div class="value">'+
+                  '当前温度：<span class="t_value">0</span>℃&nbsp;&nbsp;上报间隔:<span class="t_interval">'+prop.V0+'</span>&nbsp;&nbsp;<span class="node_type">'+prop.node_type+'</span>'+
+                '</div>'+
               '</div>';
 	$("#"+prop.tid).html(html);
 }

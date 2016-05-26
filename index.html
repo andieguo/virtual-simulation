@@ -183,25 +183,35 @@ $(function(){
 });
 </script>
 </head>
-<body style="min-height: 660px; cursor: auto;" class="devpreview sourcepreview">
-<div>
-  <span>用户ID<input type="text" id="userId" value="1155223953"></span>
-  <span>用户密钥<input type="text" id="userKey" value="Xrk6UicNrbo3KiX1tYDDaUq9HAMHBYhuE2Sb4NLKFKdNcLH5"></span><br>
-  <span>服务器地址<input type="text" id="serverAddr" value="zhiyun360.com"></span><br>
-  <span>本地服务<input type="button" value="启动" id="bt_localService"><label id="label_ls"><label></span>
-  <span>远程服务<input type="button" value="启动" id="bt_remoteService"><label id="label_rs"><label></span>
-</div>
-  <input type="button" value="编辑硬件" id="bt_edithd">
-<div>
-
-</div>
-<div class="container-fluid">
+<body style="min-height: 660px; cursor: auto;" class="devpreview sourcepreview index-body">
+<header class="header">
+  <img class="logo" src="images/logo.png" alt="logo">
+  <h1 class="title">虚拟仿真系统</h1>
+</header>
+<article class="container content">
+<form class="form-inline">
+  <span>用户ID：</span>
+  <input type="text" id="userId" value="1155223953">
+  <span>用户密钥：</span>
+  <input type="text" id="userKey" value="Xrk6UicNrbo3KiX1tYDDaUq9HAMHBYhuE2Sb4NLKFKdNcLH5">
+  <span>服务器地址：</span>
+  <input type="text" id="serverAddr" value="zhiyun360.com">
+  <br>
+  <span>本地服务<span>
+  <input class="btn-form btn-on" type="button" value="启动" id="bt_localService">
+  <span>远程服务<span>
+  <input class="btn-form btn-off" type="button" value="取消" id="bt_remoteService">
+  <input class="btn-form" type="button" value="编辑硬件" id="bt_edithd">
+</form>
+</article>
+<div class="container" style="min-height: 628px;">
   <div class="row-fluid">
     <!--UI编辑区-->
-    <div class="demo ui-sortable" style="min-height: 304px; ">
+    <div class="demo ui-sortable" style="min-height: 304px;">
     </div>
   </div>
   <!--/row--> 
 </div>
+<footer class="footer">中智讯（武汉）科技有限公司版权所有 鄂ICP备13015866号-2</footer>
 </body>
 </html>
