@@ -1,10 +1,12 @@
 var tcp_list=[];
-
-function localTCP(uid,ukey){
+var tcp_server;
+//启动本地tcp服务端服务
+function startLocalTCP(uid,ukey){
 	var net = require('net');
 	var server = net.createServer();
+	tcp_server = server;
 
-	server.on("connection",function(socket){
+	tcp_server.on("connection",function(socket){
 		socket.setEncoding("utf8");
 		socket.on("data",function(data){
 			var dat = JSON.parse(data);
@@ -25,6 +27,21 @@ function localTCP(uid,ukey){
 	server.listen(28081,function(){
 		console.log("server is listening");
 	});
+}
+
+//停止本地tcp服务端服务
+function stopLocalTCP(){
+	if(tcp_server){
+		var len = tcp_list.length;
+		if(len>0){
+			for(var i in tcp_list){
+				tcp_list[i].end();
+			}
+			tcp_list=[];
+			//tcp_server.disconnect();
+			//tcp_server.close();
+		}
+	}
 }
 
 function tcpSendData(mac,data){

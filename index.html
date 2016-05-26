@@ -107,18 +107,20 @@ $(function(){
   //本地服务点击事件
   $("#bt_localService").click(function(){
     var cmd = $(this).val();
-    if(cmd == '启动'){
+    if(cmd == "启动"){
       var zcloudId = $("#userId").val();
       var zcloudKey = $("#userKey").val();
-      localWebsocket(zcloudId,zcloudKey);
-      localTCP(zcloudId,zcloudKey);
+      startLocalWebsocket(zcloudId,zcloudKey);
+      startLocalTCP(zcloudId,zcloudKey);
       localServiceTag = 1;
       $(this).val("关闭");
       $("#label_ls").text("已启动");
     }
     else{//关闭
       localServiceTag = 0;
-      $(this).val("开启");
+      stopLocalWebsocket();
+      stopLocalTCP();
+      $(this).val("启动");
       $("#label_ls").text("已停止");
     }
 
@@ -127,7 +129,7 @@ $(function(){
   //远程服务点击事件
   $("#bt_remoteService").click(function(){
     var cmd = $(this).val();
-    if(cmd == '启动'){
+    if(cmd == "启动"){
       var zcloudId = $("#userId").val();
       var zcloudKey = $("#userKey").val();
       var serverAddr = $("#serverAddr").val();
@@ -138,7 +140,7 @@ $(function(){
     }
     else{//关闭
       remoteServiceTag = 0;
-      $(this).val("开启");
+      $(this).val("启动");
       $("#label_rs").text("已停止");
     }
 
