@@ -299,6 +299,7 @@ a.language-selected { font-style: italic; font-weight: bold; }
 	margin-top: 1em;
 }
 .btn-form {
+	outline:none;
 	padding: 0 1em;
 	color: #fff;
     line-height: 2em;
@@ -307,24 +308,32 @@ a.language-selected { font-style: italic; font-weight: bold; }
     background-color: #30ACF3;
 }
 .btn-on {
+	outline:none;
 	color: #0D3374;
     border: 1px solid #0D3374;
     background-color: #fff;
 }
 .btn-off {
+	outline:none;
 	color: #BE0000;
     border: 1px solid #BE0000;
     background-color: #fff;
 }
 .btn-power {
+	outline:none;
 	margin: 0 auto;
 	width: 30px !important;
 	height: 37px;
 }
 .btn-data {
+	outline:none;
 	color: #fff;
     line-height: 1.8em;
     border: 0;
     border-radius: 5px;
     background-color: #30ACF3;
+}
+.btn-data:active,
+.btn-form:active {
+    background-color: #247CAF;
 }
