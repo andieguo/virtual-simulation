@@ -12,7 +12,7 @@ var temperature = {
                         '<div class="body">'+
                           '<img class="img" src="images/sensor/temperature.jpg" alt="">'+
                           '<div class="button">'+
-                            '<input class="power_switch btn-power" type="image" value="ON" src="images/power-on.png">'+
+                            '<input class="power_switch btn-power" type="image" value="ON" src="images/power-off.png">'+
                             '<input class="btn-data" type="button" value="UP">'+
                             '<input class="btn-data" type="button" value="DOWN">'+
                             '<input class="btn-data" type="button" value="数据策略">'+
@@ -220,7 +220,7 @@ function TemperatureUI(prop)
               '<div class="body">'+
                 '<img class="img" src="images/sensor/temperature.jpg" alt="">'+
                 '<div class="button">'+
-                  '<input class="power_switch btn-power" type="image" value="ON" src="images/power-on.png">'+
+                  '<input class="power_switch btn-power" type="image" value="ON" src="images/power-off.png">'+
                   '<input class="btn-data" type="button" value="UP">'+
                   '<input class="btn-data" type="button" value="DOWN">'+
                   '<input class="btn-data" type="button" value="数据策略">'+

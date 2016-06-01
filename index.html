@@ -84,6 +84,7 @@ function hardwareOn(btObj,divid){
       },(uiTemplateObj[divid].V0)*1000);
     }
     btObj.val("OFF");
+    btObj.attr("src","images/power-on.png");
   }
   else{//关闭传感器电源
     uiTemplateObj[divid].power = "off";
@@ -91,6 +92,7 @@ function hardwareOn(btObj,divid){
       clearInterval(sensorIntervalObj[divid]);
     }
     btObj.val("ON");
+    btObj.attr("src","images/power-off.png");
   }
 }
 
@@ -202,7 +204,7 @@ $(function(){
   <span>本地服务<span>
   <input class="btn-form btn-on" type="button" value="启动" id="bt_localService">
   <span>远程服务<span>
-  <input class="btn-form btn-off" type="button" value="取消" id="bt_remoteService">
+  <input class="btn-form btn-off" type="button" value="启动" id="bt_remoteService">
   <input class="btn-form" type="button" value="编辑硬件" id="bt_edithd">
 </form>
 </article>
