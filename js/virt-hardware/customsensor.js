@@ -1,24 +1,21 @@
-var temperature = {
+var customsensor = {
 
   html :  ' <div class="box box-element ui-draggable"> <a href="#close" class="remove label label-important"><i class="icon-remove icon-white"></i>删除</a> <span class="drag label"><i class="icon-move"></i>拖动</span>'+
                 '<span class="configuration"><button type="button" class="btn btn-mini" data-target="#attrEditorModal" role="button" data-toggle="modal">编辑</button></span>'+
-                 '<div class="preview">温度传感器</div>' +
+                 '<div class="preview">自定义传感器</div>' +
                  '<div class="view">' +
-                    '<div class="panel-sensor" id="temperature">'+
+                    '<div class="panel-sensor" id="customsensor">'+
                         '<h3 class="title">'+
-                          '温度传感器标题'+
+                          '传感器标题'+
                           '<div class="right">MAC地址：<span class="mac">11:22:33:44:55:66:77:88</span></div>'+
                         '</h3>'+
                         '<div class="body">'+
-                          '<img class="img" src="images/sensor/temperature.jpg" alt="">'+
+                          '<img class="img" src="images/sensor/customsensor.jpg" alt="">'+
                           '<div class="button">'+
                             '<input class="power_switch btn-power" type="image" value="ON" src="images/power-off.png">'+
-                            '<input class="btn-data" type="button" value="UP">'+
-                            '<input class="btn-data" type="button" value="DOWN">'+
-                            '<input class="btn-data" type="button" value="数据策略">'+
                           '</div>'+
                           '<div class="value">'+
-                            '当前温度：<span class="t_value">0</span>℃&nbsp;&nbsp;'+
+                            '当前值：<span class="t_value">0</span>&nbsp;&nbsp;'+
                             '上报间隔:<span class="t_interval">30</span>&nbsp;&nbsp;'+
                             '<span class="node_type">ZigBee</span>'+
                           '</div>'+
@@ -36,17 +33,6 @@ var temperature = {
                       '<div class="input-prepend mr10p">' +
                         '<span class="add-on">MAC地址：</span>' +
                         '<input class="w200p widgetAttrChange" id="sensor_mac" type="text" disabled="true ">' +
-                      '</div><br>' +
-                      '<div class="input-prepend mr10p">' +
-                        '<span class="add-on">上报开关</span>' +
-                        '<select class="w50p widgetAttrChange" id="update_sw">' +
-                            '<option value="1" selected="selected">开</option>' +
-                            '<option value="0">关</option>' +
-                        '</select>' +
-                      '</div>' + 
-                      '<div class="input-prepend mr10p">' +
-                        '<span class="add-on">设定上报间隔</span>' +
-                        '<input class="w50p widgetAttrChange" id="update_time" type="text">' +
                       '</div>' +
                       '<div class="input-prepend mr10p">' +
                         '<span class="add-on">节点类型</span>' +
@@ -56,29 +42,53 @@ var temperature = {
                             '<option value="Bluetooth">Bluetooth</option>' +
                             '<option value="WiFi">WiFi</option>' +
                         '</select>' +
-                      '</div><br>' +                     
-                      '<div class="input-prepend mr10p">' +
-                        '<span class="add-on">数据策略</span>' +
-                        '<select class="w100p widgetAttrChange data_policy">' +
-                            '<option value="data_random" selected="selected">随机数</option>' +
-                            '<option value="data_sin">正弦函数</option>' +
-                            '<option value="data_cos">余弦函数</option>' +
-                        '</select>' +
-                      '</div>' + 
-                      '<div class="input-prepend mr10p">' +
-                        '<span class="add-on">最小值</span>' +
-                        '<input class="w50p widgetAttrChange" id="min_value" type="text">' +
+                      '</div><br>' + 
+                      '<div class="input-prepend mr10p" style="font-size:8px">' +
+                        '<span class="add-on">通道选择</span>' +
+                        '<input type="checkbox" name="var_a" value="A7" />A7' +
+                        '<input type="checkbox" name="var_a" value="A6" />A6' +
+                        '<input type="checkbox" name="var_a" value="A5" />A5' +
+                        '<input type="checkbox" name="var_a" value="A4" />A4' +
+                        '<input type="checkbox" name="var_a" value="A3" />A3' +
+                        '<input type="checkbox" name="var_a" value="A2" />A2' +
+                        '<input type="checkbox" name="var_a" value="A1" />A1' +
+                        '<input type="checkbox" name="var_a" value="A0" />A0' +                                             
                       '</div>' +
-                      '<div class="input-prepend mr10p">' +
-                        '<span class="add-on">最大值</span>' +
-                        '<input class="w50p widgetAttrChange" id="max_value" type="text">' +
-                      '</div>' +      
+                      '<div class="input-prepend mr10p" style="font-size:8px">' +
+                        '<span class="add-on">变量选择</span>' +
+                        '<input type="checkbox" name="var_v" value="V3" />V3' +
+                        '<input type="checkbox" name="var_v" value="V2" />V2' +
+                        '<input type="checkbox" name="var_v" value="V1" />V1' +
+                        '<input type="checkbox" name="var_v" value="V0" />V0' +                                           
+                      '</div><br>' + 
+                      '<div class="input-prepend mr10p" style="font-size:8px">' +
+                        '<span class="add-on">D0位设置</span>' +
+                        '<input type="checkbox" name="var_d0" value="7" />7' +
+                        '<input type="checkbox" name="var_d0" value="6" />6' +
+                        '<input type="checkbox" name="var_d0" value="5" />5' +
+                        '<input type="checkbox" name="var_d0" value="4" />4' +
+                        '<input type="checkbox" name="var_d0" value="3" />3' +
+                        '<input type="checkbox" name="var_d0" value="2" />2' +
+                        '<input type="checkbox" name="var_d0" value="1" />1' +
+                        '<input type="checkbox" name="var_d0" value="0" />0' +                                             
+                      '</div>' +
+                      '<div class="input-prepend mr10p" style="font-size:8px">' +
+                        '<span class="add-on">D1位设置</span>' +
+                        '<input type="checkbox" name="var_d1" value="7" />7' +
+                        '<input type="checkbox" name="var_d1" value="6" />6' +
+                        '<input type="checkbox" name="var_d1" value="5" />5' +
+                        '<input type="checkbox" name="var_d1" value="4" />4' +
+                        '<input type="checkbox" name="var_d1" value="3" />3' +
+                        '<input type="checkbox" name="var_d1" value="2" />2' +
+                        '<input type="checkbox" name="var_d1" value="1" />1' +
+                        '<input type="checkbox" name="var_d1" value="0" />0' +                                             
+                      '</div><br>' +   
                 ' </div>',
 
   create: function(){//默认情况下无参数，可接收控件属性参数对象create(properties)
     var properties = {
-        tid: "temperature",
-        title:"温度传感器",
+        tid: "customsensor",
+        title:"自定义传感器",
         mac:makeMacAddr("ZigBee"),
         V0:30,
         D0:1,
@@ -94,14 +104,14 @@ var temperature = {
 		$.extend(properties,arguments[0]);
 	}
 	else{
-	    var e = $(".demo #temperature");
+	    var e = $(".demo #customsensor");
 	    var t = randomNumber();
-	    var n = "temperature_" + t;
+	    var n = "customsensor_" + t;
 	    e.attr("id", n);
 	    $.extend(properties,{"tid":n});
 	}
     
-    var ui = new TemperatureUI(properties);
+    var ui = new customSensorUI(properties);
     return ui;
   },
 
@@ -136,7 +146,7 @@ var temperature = {
           power:"off"
       };
       
-      var ui = new TemperatureUI(properties);
+      var ui = new customSensorUI(properties);
       return ui;
   },
 
@@ -155,7 +165,7 @@ var temperature = {
       if(uiTemplateObj[divid].D0 != 1){
         uiTemplateObj[divid].D0 = 1;
         sensorIntervalObj[divid] =setInterval(function(){//开启定时器
-          temperature.updateData(divid);
+          customsensor.updateData(divid);
         },(uiTemplateObj[divid].V0)*1000);
       }
     }
@@ -173,7 +183,7 @@ var temperature = {
 
       uiTemplateObj[divid].V0 = val;
       sensorIntervalObj[divid] =setInterval(function(){//开启定时器
-        temperature.updateData(divid);
+        customsensor.updateData(divid);
       },val*1000);
     }
 
@@ -185,17 +195,17 @@ var temperature = {
     if(uiTemplateObj[divid].power == "off") return;
     
     if(chan == "A0" && val =='?'){
-      temperature.updateData(divid);
+      customsensor.updateData(divid);
     }
     if(chan == "D0" && val =='?'){
         var data = "{D0=1}";
         pushSensorData(uiTemplateObj[divid].mac,data);//推送数据给订阅者
     }
     if(chan == "OD0" && val =='1'){
-      temperature.updateD0(divid,1);
+      customsensor.updateD0(divid,1);
     }
     if(chan == "CD0" && val =='1'){
-      temperature.updateD0(divid,0);
+      customsensor.updateD0(divid,0);
     }
     if(chan == "V0"){
       if(val =='?'){
@@ -204,30 +214,28 @@ var temperature = {
         pushSensorData(uiTemplateObj[divid].mac,data);//推送数据给订阅者
       }
       else{
-        temperature.updateV0(divid,parseInt(val));
+        customsensor.updateV0(divid,parseInt(val));
       }
     }
   }
 }
 
-function TemperatureUI(prop)
+function customSensorUI(prop)
 {
 	this.properties = prop;
 	var html =  '<h3 class="title">'+
-                prop.title+
+                prop.title +
                 '<div class="right">MAC地址：<span class="mac">'+prop.mac+'</span></div>'+
               '</h3>'+
               '<div class="body">'+
-                '<img class="img" src="images/sensor/temperature.jpg" alt="">'+
+                '<img class="img" src="images/sensor/customsensor.jpg" alt="">'+
                 '<div class="button">'+
                   '<input class="power_switch btn-power" type="image" value="ON" src="images/power-off.png">'+
-                  '<input class="btn-data" type="button" value="UP">'+
-                  '<input class="btn-data" type="button" value="DOWN">'+
-                  '<input class="btn-data" type="button" value="数据策略">'+
                 '</div>'+
                 '<div class="value">'+
-                  '当前温度：<span class="t_value">0</span>℃&nbsp;&nbsp;上报间隔:<span class="t_interval">'+prop.V0+'</span>&nbsp;&nbsp;<span class="node_type">'+prop.node_type+'</span>'+
+                  '当前值：<span class="t_value">0</span>&nbsp;&nbsp;上报间隔:<span class="t_interval">'+prop.V0+'</span>&nbsp;&nbsp;<span class="node_type">'+prop.node_type+'</span>'+
                 '</div>'+
               '</div>';
+
 	$("#"+prop.tid).html(html);
 }

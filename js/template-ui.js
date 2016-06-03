@@ -354,6 +354,47 @@ $(document).ready(function() {
 			uiTemplateObj[ui.properties.tid] = ui.properties;//将拖动后创建的控件ID、属性进行缓存			
 		});
 
+		//控件属性通道复选框点击事件
+		$("[name = var_a]:checkbox").change(function(){
+			if($(this).is(":checked")){//新增
+		      var chanHtml = '<div chan="'+$(this).val()+'">' +                  
+		                        '<div class="input-prepend mr10p">' +
+		                          '<span class="add-on">'+$(this).val()+'数据策略</span>' +
+		                          '<select class="w100p widgetAttrChange data_policy">' +
+		                              '<option value="data_random" selected="selected">随机数</option>' +
+		                              '<option value="data_sin">正弦函数</option>' +
+		                              '<option value="data_cos">余弦函数</option>' +
+		                          '</select>' +
+		                        '</div>' + 
+		                        '<div class="input-prepend mr10p">' +
+		                          '<span class="add-on">最小值</span>' +
+		                          '<input class="w50p widgetAttrChange" id="min_value" type="text">' +
+		                        '</div>' +
+		                        '<div class="input-prepend mr10p">' +
+		                          '<span class="add-on">最大值</span>' +
+		                          '<input class="w50p widgetAttrChange" id="max_value" type="text">' +
+		                        '</div>' + 
+		                      '</div>';
+		      $(".attr-body").append(chanHtml);
+		    }
+		    else{//减
+		      $("[chan = "+$(this).val()+"]").remove();
+		    }
+		});
+
+		//控件属性变量复选框点击事件
+		$("[name = var_v]:checkbox").change(function(){
+			if($(this).is(":checked")){//新增
+		      var chanHtml ='<div class="input-prepend mr10p" chan='+$(this).val()+'>' +
+	                          '<span class="add-on">'+$(this).val()+'值</span>' +
+	                          '<input class="w50p widgetAttrChange" id="'+$(this).val()+'_value" type="text">' +
+	                        '</div>';
+	          $(".attr-body").append(chanHtml);
+			}
+			else{
+				$("[chan = "+$(this).val()+"]").remove();
+			}
+		});
 	});
 
 	<!--属性窗口关闭-->

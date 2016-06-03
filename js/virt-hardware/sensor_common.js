@@ -3,10 +3,10 @@ var onMessageArrive;//消息到达回调函数
 //自动生成MAC地址
 function makeMacAddr(node_type){
 	if(node_type == "ZigBee"){//zigbee
-		var mac="";
-		for(var i=0;i<8;i++){
+		var mac="01:12:4B:00:";
+		for(var i=0;i<4;i++){
 		  mac=mac+makeRandom0F(2);
-		  if(i<7){
+		  if(i<3){
 			mac=mac+":"
 		  }
 		}
@@ -46,7 +46,7 @@ function makeMacAddr(node_type){
 
 //生成n位0-F之间的随机数(返回字符串)
 function makeRandom0F(n){
-	var str=["0","1","2","3","4","5","6","7","8","9","a","b","c","d","e","f"];
+	var str=["0","1","2","3","4","5","6","7","8","9","A","B","C","D","E","F"];
 	var num = "";
 	for(var i=0;i<n;i++){
 		var index = Math.floor(Math.random()*16); 

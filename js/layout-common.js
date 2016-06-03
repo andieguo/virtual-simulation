@@ -1,6 +1,7 @@
 <!--定义全局变量 key:object--> 
 var gUiObject = {
 	"temperature": temperature,
+	"customsensor":customsensor
 };
 /*恢复控件的UI内容*/
 function resumeWidgetUI(temObj){
