@@ -219,6 +219,48 @@ function initContainer(){
 	configurationElm();
 }
 
+//根据新属性更新控件样式--回调函数
+function updateWidget(obj,widgetIndex,uid){
+	//如果是节点类型更换则特殊处理
+	if(obj.attr("id") == "node_type")//生成新的mac地址
+	{
+		var node_type = obj.val();
+		var mac = makeMacAddr(node_type);
+		$("#sensor_mac").val(mac);
+	}
+	var ui = gUiObject[widgetIndex].updateAttr(uid);//动态更新控件显示
+	uiTemplateObj[ui.properties.tid] = ui.properties;//将拖动后创建的控件ID、属性进行缓存
+}
+
+function getVarAHtml(varname){
+  var html = '<div class ="var_a" chan="'+varname+'">' +                  
+                '<div class="input-prepend mr10p">' +
+                  '<span class="add-on">'+varname+'数据策略</span>' +
+                  '<select class="w100p widgetAttrChange data_policy">' +
+                      '<option value="data_random" selected="selected">随机数</option>' +
+                      '<option value="data_sin">正弦函数</option>' +
+                      '<option value="data_cos">余弦函数</option>' +
+                  '</select>' +
+                '</div>' + 
+                '<div class="input-prepend mr10p">' +
+                  '<span class="add-on">最小值</span>' +
+                  '<input class="w50p widgetAttrChange min_value" value ="0" type="text">' +
+                '</div>' +
+                '<div class="input-prepend mr10p">' +
+                  '<span class="add-on">最大值</span>' +
+                  '<input class="w50p widgetAttrChange max_value" value ="0" type="text">' +
+                '</div>' + 
+              '</div>';
+  return html;
+}
+
+function getVarVHtml(varname){
+  var html ='<div class="input-prepend mr10p var_v" chan='+varname+'>' +
+                  '<span class="add-on">'+varname+'值</span>' +
+                  '<input class="w50p widgetAttrChange" value ="0" type="text">' +
+                '</div>';
+   return html;	
+}
 $(document).ready(function() {
 	var tabContent = "";
 	var layoutContent = "";
@@ -341,59 +383,40 @@ $(document).ready(function() {
 			$("body").css("min-height", $(window).height() - 90 - attrModalHeigh);
 		}
 
-		//根据新属性更新控件样式
-		$(".widgetAttrChange").change(function(){
-			//如果是节点类型更换则特殊处理
-			if($(this).attr("id") == "node_type")//生成新的mac地址
-			{
-				var node_type = $(this).val();
-				var mac = makeMacAddr(node_type);
-				$("#sensor_mac").val(mac);
-			}
-			var ui = gUiObject[widgetIndex].updateAttr(uid);//动态更新控件显示
-			uiTemplateObj[ui.properties.tid] = ui.properties;//将拖动后创建的控件ID、属性进行缓存			
-		});
+		//根据新属性更新控件
+		$(".widgetAttrChange").on("change",function(){updateWidget($(this),widgetIndex,uid)});
 
 		//控件属性通道复选框点击事件
 		$("[name = var_a]:checkbox").change(function(){
 			if($(this).is(":checked")){//新增
-		      var chanHtml = '<div chan="'+$(this).val()+'">' +                  
-		                        '<div class="input-prepend mr10p">' +
-		                          '<span class="add-on">'+$(this).val()+'数据策略</span>' +
-		                          '<select class="w100p widgetAttrChange data_policy">' +
-		                              '<option value="data_random" selected="selected">随机数</option>' +
-		                              '<option value="data_sin">正弦函数</option>' +
-		                              '<option value="data_cos">余弦函数</option>' +
-		                          '</select>' +
-		                        '</div>' + 
-		                        '<div class="input-prepend mr10p">' +
-		                          '<span class="add-on">最小值</span>' +
-		                          '<input class="w50p widgetAttrChange" id="min_value" type="text">' +
-		                        '</div>' +
-		                        '<div class="input-prepend mr10p">' +
-		                          '<span class="add-on">最大值</span>' +
-		                          '<input class="w50p widgetAttrChange" id="max_value" type="text">' +
-		                        '</div>' + 
-		                      '</div>';
-		      $(".attr-body").append(chanHtml);
+		      var chanHtml = getVarAHtml($(this).val());
+		      $("#var_alist").append(chanHtml);
 		    }
 		    else{//减
 		      $("[chan = "+$(this).val()+"]").remove();
 		    }
+		    $(".widgetAttrChange").off("change");
+		    $(".widgetAttrChange").on("change",function(){updateWidget($(this),widgetIndex,uid)});
+		    updateWidget($(this),widgetIndex,uid);
 		});
 
 		//控件属性变量复选框点击事件
 		$("[name = var_v]:checkbox").change(function(){
 			if($(this).is(":checked")){//新增
-		      var chanHtml ='<div class="input-prepend mr10p" chan='+$(this).val()+'>' +
-	                          '<span class="add-on">'+$(this).val()+'值</span>' +
-	                          '<input class="w50p widgetAttrChange" id="'+$(this).val()+'_value" type="text">' +
-	                        '</div>';
-	          $(".attr-body").append(chanHtml);
+		      var chanHtml =getVarVHtml($(this).val());
+	          $("#var_vlist").append(chanHtml);
 			}
 			else{
 				$("[chan = "+$(this).val()+"]").remove();
 			}
+		    $(".widgetAttrChange").off("change");
+		    $(".widgetAttrChange").on("change",function(){updateWidget($(this),widgetIndex,uid)});
+		    updateWidget($(this),widgetIndex,uid);
+		});
+
+		//D0、D1数据位变化
+		$("[name = var_d0]:checkbox,[name = var_d1]:checkbox").change(function(){
+		    updateWidget($(this),widgetIndex,uid);
 		});
 	});
 

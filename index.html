@@ -69,12 +69,14 @@ function hardwareOn(btObj,divid){
 
   if(cmd == "ON"){//开启传感器电源
     uiTemplateObj[divid].power = "on";
-    if(uiTemplateObj[divid].D0){
-      sensorIntervalObj[divid] =setInterval(function(){
+    //获取上报时间间隔
+    var V0 = getV0Value(divid);
+    //开启定时器
+    sensorIntervalObj[divid] =setInterval(function(){
       var sensor = divid.substring(0,divid.indexOf('_'));
       gUiObject[sensor].updateData(divid);//交给传感器处理
-      },(uiTemplateObj[divid].V0)*1000);
-    }
+    },V0*1000);
+
     btObj.val("OFF");
     btObj.attr("src","images/power-on.png");
   }

@@ -56,10 +56,10 @@ function makeRandom0F(n){
 }
 
 //传感器数据生成策略
-function makeSensorData(policy,range){
-	switch(policy){
+function makeSensorData(data_policy){
+	switch(data_policy.method){
 		case "data_random":
-			return makeRangeRandNum(range.min,range.max);
+			return makeRangeRandNum(data_policy.min_val,data_policy.max_val);
 		default:
 			return 0;
 	}
@@ -81,4 +81,68 @@ function pushSensorData(mac,data){
 		remoteSendData(mac,data);
 	}
 	
+}
+
+function getD0Value(divid){
+    var D0;
+    for(var i in uiTemplateObj[divid].dlist){
+      if(uiTemplateObj[divid].dlist[i].var_name == "D0"){
+        D0 = uiTemplateObj[divid].dlist[i].data_bit;
+        break;
+      }
+    }
+    return D0;
+}
+function setD0Value(divid,val){
+    for(var i in uiTemplateObj[divid].dlist){
+      if(uiTemplateObj[divid].dlist[i].var_name == "D0"){
+        uiTemplateObj[divid].dlist[i].data_bit =val;
+        break;
+      }
+    }
+}
+function getD1Value(divid){
+    var D1;
+    for(var i in uiTemplateObj[divid].dlist){
+      if(uiTemplateObj[divid].dlist[i].var_name == "D1"){
+        D1 = uiTemplateObj[divid].dlist[i].data_bit;
+        break;
+      }
+    }
+    return D1;
+}
+function setD1Value(divid,val){
+    for(var i in uiTemplateObj[divid].dlist){
+      if(uiTemplateObj[divid].dlist[i].var_name == "D1"){
+        uiTemplateObj[divid].dlist[i].data_bit =val;
+        break;
+      }
+    }
+}
+function getV0Value(divid){
+    var V0;
+    for(var i in uiTemplateObj[divid].vlist){
+      if(uiTemplateObj[divid].vlist[i].var_name == "V0"){
+        V0=uiTemplateObj[divid].vlist[i].val;
+      }
+    }
+    return V0;
+}
+function setV0Value(divid,val){
+	for(var i in uiTemplateObj[divid].vlist){
+	  if(uiTemplateObj[divid].vlist[i].var_name == "V0"){
+	    uiTemplateObj[divid].vlist[i].val = val;
+	  }
+	}
+}
+
+var sensorAttrModal ={
+    "tid": "tid",
+    "title": "自定义传感器",
+    "mac": "11:22:33:44:11:22:33:44",
+    "node_type": "ZigBee",
+    "power": "off",
+    "alist": [],
+    "vlist": [],
+    "dlist": []
 }
