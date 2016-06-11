@@ -1,6 +1,10 @@
 <!--定义全局变量 key:object--> 
 var gUiObject = {
-	"temperature": temperature,
+	"temphumi": temphumi,
+	"photosensitive":photosensitive,
+	"relay":relay,
+	"alarm":alarm,
+	"infrared":infrared,
 	"customsensor":customsensor
 };
 /*恢复控件的UI内容*/

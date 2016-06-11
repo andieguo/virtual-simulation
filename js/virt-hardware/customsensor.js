@@ -2,7 +2,7 @@ var customsensor = {
 
   html :  ' <div class="box box-element ui-draggable"> <a href="#close" class="remove label label-important"><i class="icon-remove icon-white"></i>删除</a> <span class="drag label"><i class="icon-move"></i>拖动</span>'+
                 '<span class="configuration"><button type="button" class="btn btn-mini" data-target="#attrEditorModal" role="button" data-toggle="modal">编辑</button></span>'+
-                 '<div class="preview">自定义传感器</div>' +
+                 '<div class="preview">通用传感器模板</div>' +
                  '<div class="view">' +
                     '<div class="panel-sensor" id="customsensor">'+
                         '<h3 class="title">'+
@@ -87,7 +87,7 @@ var customsensor = {
                 ' </div>',
 
   create: function(){//默认情况下无参数，可接收控件属性参数对象create(properties)
-    var properties = sensorAttrModal;
+    var properties = getSensorAttrModal();
     properties.tid = "customsensor";
     properties.mac = makeMacAddr("ZigBee");
 
@@ -156,20 +156,20 @@ var customsensor = {
   },
 
   updateAttr: function(divid){
-      var properties = sensorAttrModal;
+      var properties = getSensorAttrModal();
       properties.tid = divid;
       properties.title = $("#sensor_title").val();
       properties.mac = $("#sensor_mac").val();
       properties.node_type = $("#node_type").val();
-      properties.alist = [];
-      properties.vlist = [];
-      properties.dlist = [];
+      //properties.alist = [];
+      //properties.vlist = [];
+      //properties.dlist = [];
 
       //遍历A0-7变量信息
       $(".var_a").each(function(){
         var t = {
             "var_name": $(this).attr("chan"),
-            "recent_val": "0",
+            "recent_val": 0,
             "data_policy": {
                 "min_val": parseFloat( $(this).find(".min_value").val()),
                 "max_val": parseFloat( $(this).find(".max_value").val()),
@@ -215,7 +215,7 @@ var customsensor = {
         var t =  {
             "var_name": "D1",
             "data_bit": t_d1,
-            "recent_val": t_d1
+            "recent_val": 0
         };
         properties.dlist.push(t);
       }
@@ -229,22 +229,31 @@ var customsensor = {
     var D0 = getD0Value(divid);
     //上传各通道数据
     var data ="";
-    for(var i in uiTemplateObj[divid].alist){
-      var str = uiTemplateObj[divid].alist[i].var_name;
-      var bit = parseInt(str.substring(1));
-      if(Math.pow(2,bit) & D0){//开启上报开关才能上报数据
-        var t = makeSensorData(uiTemplateObj[divid].alist[i].data_policy);
-        uiTemplateObj[divid].alist[i].recent_val = t;
-        data = data+uiTemplateObj[divid].alist[i].var_name+"="+t+",";
+    if(uiTemplateObj[divid].alist.length >0){//若有A0-A7则主动上报A0-A7的值
+      for(var i in uiTemplateObj[divid].alist){
+        var str = uiTemplateObj[divid].alist[i].var_name;
+        var bit = parseInt(str.substring(1));
+        if(Math.pow(2,bit) & D0){//开启上报开关才能上报数据
+          var t = makeSensorData(uiTemplateObj[divid].alist[i].data_policy,uiTemplateObj[divid].alist[i].recent_val);
+          uiTemplateObj[divid].alist[i].recent_val = t;
+          data = data+uiTemplateObj[divid].alist[i].var_name+"="+t+",";
+        }
       }
+      if(data !=""){
+        data = data.substring(0,data.lastIndexOf(','));
+        data = '{'+data+'}';
+        pushSensorData(uiTemplateObj[divid].mac,data);//推送数据给订阅者
+      }    
+      //传感器显示实时数据
+      $("#"+divid).find(".t_value").text(data);
     }
-    if(data !=""){
-      data = data.substring(0,data.lastIndexOf(','));
-      data = '{'+data+'}';
-      pushSensorData(uiTemplateObj[divid].mac,data);//推送数据给订阅者
-    }    
-    //传感器显示实时数据
-    $("#"+divid).find(".t_value").text(data);
+    else{//无A0-A7,则上报D1的值
+      var D1 = getD1Value(divid);
+      if(D1 != undefined){
+        data = "{D1="+D1+"}";
+        pushSensorData(uiTemplateObj[divid].mac,data);//推送数据给订阅者
+      } 
+    }
   },
 
   updateD0:function(divid,val,cmd){//更新上报状态
@@ -285,14 +294,14 @@ var customsensor = {
 
   updateD1:function(divid,val,cmd){//更新D1的值
     var D1 = getD1Value(divid);
-    if(cmd == "open"){//OD0命令
-      if((D1 & val) < val){//开启新通道的上传开关
+    if(cmd == "open"){//OD1命令
+      if((D1 & val) < val){
         var t = D1|val;
         setD1Value(divid,t);
         $("#"+divid).find(".d1_value").text("D1="+t);
       }
     }
-    if(cmd == "close"){//CD0命令
+    if(cmd == "close"){//CD1命令
       if((D1 & val) > 0){//
         var t = D1-(D1&val);
         setD1Value(divid,t);
@@ -311,11 +320,9 @@ var customsensor = {
         customsensor.updateData(divid);
       },V0*1000);
     }
-    //传感器控件显示
-    //$("#"+divid).find(".t_interval").val(val);
   },
 
-  messageArrive:function(divid,chan,val){//{A0=?,V0=20}、{A0=?}、{v0=20}
+  messageArrive:function(divid,chan,val){
     if(uiTemplateObj[divid].power == "off") return;
     
     var reg = /^.*A[0-7].*$/;
@@ -415,11 +422,11 @@ function customSensorUI(prop)
   //显示D0、D1相关的值
   for(var i in prop.dlist){
     if(prop.dlist[i].var_name == "D0"){
-      str = "D0="+prop.dlist[i].data_bit;
+      str = "D0="+prop.dlist[i].recent_val;
       $("#"+prop.tid).find(".d0_value").text(str);
     }
     if(prop.dlist[i].var_name == "D1"){
-      str = "D1="+prop.dlist[i].data_bit;
+      str = "D1="+prop.dlist[i].recent_val;
       $("#"+prop.tid).find(".d1_value").text(str);
     }
   }  

@@ -37,7 +37,11 @@
 
 <!--导入控件js文件--> 
 <script type="text/javascript" src="js/virt-hardware/sensor_common.js"></script>
-<script type="text/javascript" src="js/virt-hardware/temperature.js"></script>
+<script type="text/javascript" src="js/virt-hardware/temphumi.js"></script>
+<script type="text/javascript" src="js/virt-hardware/photosensitive.js"></script>
+<script type="text/javascript" src="js/virt-hardware/relay.js"></script>
+<script type="text/javascript" src="js/virt-hardware/alarm.js"></script>
+<script type="text/javascript" src="js/virt-hardware/infrared.js"></script>
 <script type="text/javascript" src="js/virt-hardware/customsensor.js"></script>
 
 <script type="text/javascript" src="js/layout-common.js"></script>
@@ -66,23 +70,26 @@ function initTemplateObj(){
 //虚拟硬件开始工作
 function hardwareOn(btObj,divid){
   var cmd = btObj.val();
+  //获取上报时间间隔
+  var V0 = getV0Value(divid);
 
   if(cmd == "ON"){//开启传感器电源
     uiTemplateObj[divid].power = "on";
-    //获取上报时间间隔
-    var V0 = getV0Value(divid);
     //开启定时器
-    sensorIntervalObj[divid] =setInterval(function(){
-      var sensor = divid.substring(0,divid.indexOf('_'));
-      gUiObject[sensor].updateData(divid);//交给传感器处理
-    },V0*1000);
+    if(V0){
+        sensorIntervalObj[divid] =setInterval(function(){
+        var sensor = divid.substring(0,divid.indexOf('_'));
+        gUiObject[sensor].updateData(divid);//交给传感器处理
+      },V0*1000); 
+    }
+
 
     btObj.val("OFF");
     btObj.attr("src","images/power-on.png");
   }
   else{//关闭传感器电源
     uiTemplateObj[divid].power = "off";
-    if(uiTemplateObj[divid].D0){
+    if(V0){
       clearInterval(sensorIntervalObj[divid]);
     }
     btObj.val("ON");
@@ -110,14 +117,16 @@ $(function(){
       startLocalTCP(zcloudId,zcloudKey);
       localServiceTag = 1;
       $(this).val("关闭");
-      $("#label_ls").text("已启动");
+      $(this).removeClass("btn-on");
+      $(this).addClass("btn-off");
     }
     else{//关闭
       localServiceTag = 0;
       stopLocalWebsocket();
       stopLocalTCP();
       $(this).val("启动");
-      $("#label_ls").text("已停止");
+      $(this).removeClass("btn-off");
+      $(this).addClass("btn-on");
     }
 
   });
@@ -132,12 +141,14 @@ $(function(){
       remoteTCP(zcloudId,zcloudKey,serverAddr);
       remoteServiceTag =1;
       $(this).val("关闭");
-      $("#label_rs").text("已启动");
+      $(this).removeClass("btn-on");
+      $(this).addClass("btn-off");
     }
     else{//关闭
       remoteServiceTag = 0;
       $(this).val("启动");
-      $("#label_rs").text("已停止");
+      $(this).removeClass("btn-off");
+      $(this).addClass("btn-on");
     }
 
   });
@@ -149,6 +160,14 @@ $(function(){
     hardwareOn(clickObj,divid);
   });
 
+  //传感器按钮点击事件
+  $(".btn_sensor").click(function(){
+    var key = $(this).val();
+    var divid = $(this).parents(".view").children().attr("id");
+    var sensor = divid.substring(0,divid.indexOf('_'));
+    gUiObject[sensor].handSensorBtnEvt(key,divid);//交给传感器处理   
+  });
+  
   //接收、处理上层发送的指令
   onMessageArrive = function(mac,dat){
     //console.log("mac:"+mac+",data:"+dat);
@@ -198,7 +217,7 @@ $(function(){
   <span>本地服务<span>
   <input class="btn-form btn-on" type="button" value="启动" id="bt_localService">
   <span>远程服务<span>
-  <input class="btn-form btn-off" type="button" value="启动" id="bt_remoteService">
+  <input class="btn-form btn-on" type="button" value="启动" id="bt_remoteService">
   <input class="btn-form" type="button" value="编辑硬件" id="bt_edithd">
 </form>
 </article>

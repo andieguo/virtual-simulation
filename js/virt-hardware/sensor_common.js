@@ -56,10 +56,14 @@ function makeRandom0F(n){
 }
 
 //传感器数据生成策略
-function makeSensorData(data_policy){
+function makeSensorData(data_policy,lastVal){
 	switch(data_policy.method){
 		case "data_random":
 			return makeRangeRandNum(data_policy.min_val,data_policy.max_val);
+		case "data_sin":
+			return makeRangeSinNum(data_policy.min_val,data_policy.max_val,lastVal);
+		case "data_cos":
+			return makeRangeCosNum(data_policy.min_val,data_policy.max_val,lastVal);
 		default:
 			return 0;
 	}
@@ -69,6 +73,55 @@ function makeSensorData(data_policy){
 function makeRangeRandNum(low,high){
 	var r=high-low+1;
 	return Math.floor(Math.random()*r+low);
+}
+
+//传感器生成任意区间sin三角函数值
+function makeRangeSinNum(low,high,lastVal){
+	lastVal = parseFloat(lastVal);
+	var a = high-low;
+	var b = high+low
+	var c;
+	if(lastVal < low || lastVal >high){
+		c = b/2;
+	}
+	else{
+		c = lastVal;
+	}
+
+	if(a !=0){
+		var angle = Math.asin((2*c-b)/a);
+		var addAngle = 10*Math.PI/180;
+		angle = angle + addAngle;
+		var y = a*(Math.sin(angle))/2 +(b/2);
+		return y.toFixed(1);
+	}
+	else{
+		return 0;
+	}	
+}
+
+//传感器生成任意区间cos三角函数值
+function makeRangeCosNum(low,high,lastVal){
+	var a = high-low;
+	var b = high+low
+	var c;
+	if(lastVal < low || lastVal >high){
+		c = b/2;
+	}
+	else{
+		c = lastVal;
+	}
+
+	if(a !=0){
+		var angle = Math.acos((2*c-b)/a);
+		var addAngle = 10*Math.PI/180;
+		angle = angle + addAngle;
+		var y = a*(Math.cos(angle))/2 +b/2;
+		return y.toFixed(1);
+	}
+	else{
+		return 0;
+	}
 }
 
 //推送数据
@@ -87,7 +140,7 @@ function getD0Value(divid){
     var D0;
     for(var i in uiTemplateObj[divid].dlist){
       if(uiTemplateObj[divid].dlist[i].var_name == "D0"){
-        D0 = uiTemplateObj[divid].dlist[i].data_bit;
+        D0 = uiTemplateObj[divid].dlist[i].recent_val;
         break;
       }
     }
@@ -96,7 +149,7 @@ function getD0Value(divid){
 function setD0Value(divid,val){
     for(var i in uiTemplateObj[divid].dlist){
       if(uiTemplateObj[divid].dlist[i].var_name == "D0"){
-        uiTemplateObj[divid].dlist[i].data_bit =val;
+        uiTemplateObj[divid].dlist[i].recent_val =val;
         break;
       }
     }
@@ -105,7 +158,7 @@ function getD1Value(divid){
     var D1;
     for(var i in uiTemplateObj[divid].dlist){
       if(uiTemplateObj[divid].dlist[i].var_name == "D1"){
-        D1 = uiTemplateObj[divid].dlist[i].data_bit;
+        D1 = uiTemplateObj[divid].dlist[i].recent_val;
         break;
       }
     }
@@ -114,7 +167,7 @@ function getD1Value(divid){
 function setD1Value(divid,val){
     for(var i in uiTemplateObj[divid].dlist){
       if(uiTemplateObj[divid].dlist[i].var_name == "D1"){
-        uiTemplateObj[divid].dlist[i].data_bit =val;
+        uiTemplateObj[divid].dlist[i].recent_val =val;
         break;
       }
     }
@@ -136,13 +189,16 @@ function setV0Value(divid,val){
 	}
 }
 
-var sensorAttrModal ={
-    "tid": "tid",
-    "title": "自定义传感器",
-    "mac": "11:22:33:44:11:22:33:44",
-    "node_type": "ZigBee",
-    "power": "off",
-    "alist": [],
-    "vlist": [],
-    "dlist": []
+function getSensorAttrModal(){
+	var sensorAttrModal ={
+	    "tid": "tid",
+	    "title": "通用传感器模板",
+	    "mac": "11:22:33:44:11:22:33:44",
+	    "node_type": "ZigBee",
+	    "power": "off",
+	    "alist": [],
+	    "vlist": [],
+	    "dlist": []
+	};
+	return 	sensorAttrModal;
 }
