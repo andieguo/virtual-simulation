@@ -1,24 +1,24 @@
-/*继电器*/
-var relay = {
+/*大气压力传感器*/
+var pressure = {
 
   html :  ' <div class="box box-element ui-draggable"> <a href="#close" class="remove label label-important"><i class="icon-remove icon-white"></i>删除</a> <span class="drag label"><i class="icon-move"></i>拖动</span>'+
                 '<span class="configuration"><button type="button" class="btn btn-mini" data-target="#attrEditorModal" role="button" data-toggle="modal">编辑</button></span>'+
-                 '<div class="preview">2路继电器</div>' +
+                 '<div class="preview">大气压力传感器</div>' +
                  '<div class="view">' +
-                    '<div class="panel-sensor" id="relay">'+
+                    '<div class="panel-sensor" id="pressure">'+
                         '<h3 class="title">'+
-                          '2路继电器标题'+
+                          '大气压力传感器标题'+
                           '<div class="right">MAC地址：<span class="mac">11:22:33:44:55:66:77:88</span></div>'+
                         '</h3>'+
                         '<div class="body">'+
-                          '<img class="img" src="images/sensor/relay00.jpg" alt="">'+
+                          '<img class="img" src="images/sensor/pressure.jpg" alt="">'+
                           '<div class="button">'+
                             '<input class="power_switch btn-power" type="image" value="ON" src="images/power-off.png">'+
                             '<input class="btn-data btn_sensor" type="button" value="K1">'+
                             '<input class="btn-data btn_sensor" type="button" value="K2">'+
                           '</div>'+
                           '<div class="value">'+
-                            'D1值：<span class="t_value">0</span>&nbsp;&nbsp;'+
+                            '压强：<span class="t_value">0</span>Pa&nbsp;&nbsp;'+
                             '上报开关:<span class="d0_value">30</span>&nbsp;&nbsp;上报间隔:<span class="v0_value">30</span>&nbsp;&nbsp;'+
                             '<span class="node_type">ZigBee</span>'+
                           '</div>'+
@@ -48,7 +48,7 @@ var relay = {
                       '</div><br>' + 
                       '<div class="input-prepend mr10p">' +
                         '<span class="add-on">通道</span>' +
-                        '<input class="w200p widgetAttrChange" id="sensor_mac" type="text" value="D1" disabled="true ">' +
+                        '<input class="w200p widgetAttrChange" id="sensor_mac" type="text" value="A0" disabled="true ">' +
                       '</div>' + 
                       '<div class="input-prepend mr10p">' +
                         '<span class="add-on">D0设置</span>' +
@@ -61,38 +61,53 @@ var relay = {
                         '<span class="add-on">V0值</span>' +
                         '<input class="w50p widgetAttrChange" value ="0" type="text">' +
                       '</div>'+
-                      '<div class="input-prepend mr10p">' +
-                        '<span class="add-on">D1设置</span>' +
-                        '<select class="w50p widgetAttrChange" id="var_d1">' +
-                            '<option value="0" selected="selected">0</option>' +
-                            '<option value="1">1</option>' +
-                            '<option value="2">2</option>' +
-                            '<option value="3">3</option>' +
-                        '</select>' +
+                      '<div class ="var_a" chan="A0">' +                  
+                        '<div class="input-prepend mr10p">' +
+                          '<span class="add-on">A0数据策略</span>' +
+                          '<select class="w100p widgetAttrChange data_policy">' +
+                              '<option value="data_random" selected="selected">随机数</option>' +
+                              '<option value="data_sin">正弦函数</option>' +
+                              '<option value="data_cos">余弦函数</option>' +
+                          '</select>' +
+                        '</div>' + 
+                        '<div class="input-prepend mr10p">' +
+                          '<span class="add-on">最小值</span>' +
+                          '<input class="w50p widgetAttrChange min_value" value ="30" type="text">' +
+                        '</div>' +
+                        '<div class="input-prepend mr10p">' +
+                          '<span class="add-on">最大值</span>' +
+                          '<input class="w50p widgetAttrChange max_value" value ="40" type="text">' +
+                        '</div>' + 
                       '</div>' +                            
                 ' </div>',
 
   create: function(){//默认情况下无参数，可接收控件属性参数对象create(properties)
     var properties = getSensorAttrModal();
-    properties.tid = "relay";
-    properties.title = "2路继电器";
+    properties.tid = "pressure";
+    properties.title = "大气压力传感器";
     properties.mac = makeMacAddr("ZigBee");
+    properties.alist = [
+                          {
+                              "var_name": "A0",
+                              "recent_val": 0,
+                              "data_policy": {
+                                  "min_val": 10,
+                                  "max_val": 1000,
+                                  "method": "data_random"
+                              }
+                          }
+                      ];
     properties.dlist = [
                             {
                                 "var_name": "D0",
                                 "data_bit": 1,
                                 "recent_val": 1
-                            },
-                            {
-                                "var_name": "D1",
-                                "data_bit": 3,
-                                "recent_val": 0
                             }
                         ];
     properties.vlist = [
                             {
                                 "var_name": "V0",
-                                "val": "120"
+                                "val": "30"
                             }
                         ];
 
@@ -108,7 +123,7 @@ var relay = {
       $.extend(properties,{"tid":n});
   }
     
-    var ui = new RelayUI(properties);
+    var ui = new PressureUI(properties);
     return ui;
   },
 
@@ -116,13 +131,14 @@ var relay = {
       $("#sensor_title").val(properties.title);
       $("#sensor_mac").val(properties.mac);
       $("#node_type").find("option[value='"+properties.node_type+"']").attr("selected",true);
-
+      //变量A0显示
+      $("[chan =A0]").find(".data_policy").find("option[value='"+properties.alist[0].data_policy.method+"']").attr("selected",true);
+      $("[chan =A0]").find(".min_value").val(properties.alist[0].data_policy.min_val);
+      $("[chan =A0]").find(".max_value").val(properties.alist[0].data_policy.max_val);
       //变量V0显示
       $("[chan = V0]").find("input").val(properties.vlist[0].val);
       //变量D0显示
       $("#d0_value").find("option[value='"+properties.dlist[0].data_bit+"']").attr("selected",true);
-      //变量D1显示
-      $("#d1_value").find("option[value='"+properties.dlist[1].recent_val+"']").attr("selected",true);
   },
 
   updateAttr: function(divid){
@@ -131,6 +147,20 @@ var relay = {
       properties.title = $("#sensor_title").val();
       properties.mac = $("#sensor_mac").val();
       properties.node_type = $("#node_type").val();
+
+      //遍历A0-1变量信息
+      $(".var_a").each(function(){
+        var t = {
+            "var_name": $(this).attr("chan"),
+            "recent_val": 0,
+            "data_policy": {
+                "min_val": parseFloat( $(this).find(".min_value").val()),
+                "max_val": parseFloat( $(this).find(".max_value").val()),
+                "method": $(this).find(".data_policy").val()
+            }
+        };
+        properties.alist.push(t);
+      });
 
       //遍历V0变量信息
       $(".var_v").each(function(){
@@ -149,29 +179,36 @@ var relay = {
       };
       properties.dlist.push(t);
 
-      //D1信息
-      var t =  {
-          "var_name": "D1",
-          "data_bit": 3,
-          "recent_val": parseInt($("#var_d1").val())
-      };
-      properties.dlist.push(t);
       //console.log(properties);        
-      var ui = new RelayUI(properties);
+      var ui = new PressureUI(properties);
       return ui;
   },
 
   updateData:function(divid){
     //获取通道上报开关值
     var D0 = getD0Value(divid);
-
+    //上传各通道数据
     var data ="";
-    if(D0){
-      var D1 = getD1Value(divid);
-      if(D1 != undefined){
-        data = "{D1="+D1+"}";
+    if(uiTemplateObj[divid].alist.length >0){//若有A0-A7则主动上报A0-A7的值
+      for(var i in uiTemplateObj[divid].alist){
+        var str = uiTemplateObj[divid].alist[i].var_name;
+        var bit = parseInt(str.substring(1));
+        if(Math.pow(2,bit) & D0){//开启上报开关才能上报数据
+          var t = makeSensorData(uiTemplateObj[divid].alist[i].data_policy,uiTemplateObj[divid].alist[i].recent_val);
+
+          //传感器前端显示
+          $("#"+divid).find(".t_value").text(t);
+
+          //临时保存
+          uiTemplateObj[divid].alist[i].recent_val = t;
+          data = data+uiTemplateObj[divid].alist[i].var_name+"="+t+",";
+        }
+      }
+      if(data !=""){
+        data = data.substring(0,data.lastIndexOf(','));
+        data = '{'+data+'}';
         pushSensorData(uiTemplateObj[divid].mac,data);//推送数据给订阅者
-      } 
+      }    
     }
   },
 
@@ -210,45 +247,7 @@ var relay = {
       }
     } 
   },
-  updateD1:function(divid,val,cmd){//更新D1的值
-    var D1 = getD1Value(divid);
-    if(cmd == "open"){//OD1命令
-      if((D1 & val) < val){
-        var t = D1|val;
-        setD1Value(divid,t);
-        if(t == 1){
-          $("#"+divid).find("img").attr("src","images/sensor/relay01.jpg");
-        }
-        if(t == 2){
-          $("#"+divid).find("img").attr("src","images/sensor/relay02.jpg");
-        }
-        if(t == 3){
-          $("#"+divid).find("img").attr("src","images/sensor/relay03.jpg");
-        }
-        $("#"+divid).find(".t_value").text(t);
-        var data = "{D1="+t+"}";
-        pushSensorData(uiTemplateObj[divid].mac,data);//推送数据给订阅者
-      }
-    }
-    if(cmd == "close"){//CD1命令
-      if((D1 & val) > 0){//
-        var t = D1-(D1&val);
-        setD1Value(divid,t);
-        if(t == 1){
-          $("#"+divid).find("img").attr("src","images/sensor/relay01.jpg");
-        }
-        if(t == 2){
-          $("#"+divid).find("img").attr("src","images/sensor/relay02.jpg");
-        }
-        if(t == 0){
-          $("#"+divid).find("img").attr("src","images/sensor/relay00.jpg");
-        }
-        $("#"+divid).find(".t_value").text(t);
-        var data = "{D1="+t+"}";
-        pushSensorData(uiTemplateObj[divid].mac,data);//推送数据给订阅者
-      }
-    }    
-  },
+
   updateV0:function(divid,val){//更新上报间隔
     setV0Value(divid,val);
     $("#"+divid).find(".v0_value").text(val);
@@ -257,7 +256,6 @@ var relay = {
       var V0 = getV0Value(divid);
       clearInterval(sensorIntervalObj[divid]);//清除原定时器
       var sensor = divid.substring(0,divid.indexOf('_'));
-
       sensorIntervalObj[divid] =setInterval(function(){//开启定时器
         gUiObject[sensor].updateData(divid);
       },V0*1000);
@@ -267,7 +265,17 @@ var relay = {
   messageArrive:function(divid,chan,val){
     if(uiTemplateObj[divid].power == "off") return;
     var sensor = divid.substring(0,divid.indexOf('_'));
-
+    
+    var reg = /^.*A[0].*$/;
+    if(reg.test(chan) && val =='?'){
+      for(var i in uiTemplateObj[divid].alist){
+        if(uiTemplateObj[divid].alist[i].var_name == chan){
+          var data = chan +"=" +uiTemplateObj[divid].alist[i].recent_val;
+          data ='{'+data +'}';
+          pushSensorData(uiTemplateObj[divid].mac,data);//推送数据给订阅者
+        }
+      }
+    }
     if(chan == "D0" && val =='?'){
       var D0 = getD0Value(divid);
       if(D0 !=undefined){
@@ -281,20 +289,6 @@ var relay = {
     }
     if(chan == "CD0"){
       gUiObject[sensor].updateD0(divid,val,"close");
-    }
-    if(chan == "D1" && val =='?'){
-      var D1 = getD1Value(divid);
-      if(D1 != undefined){
-        var data = "{D1="+D1+"}";
-        pushSensorData(uiTemplateObj[divid].mac,data);//推送数据给订阅者
-      }
-
-    }
-    if(chan == "OD1"){
-      gUiObject[sensor].updateD1(divid,val,"open");
-    }
-    if(chan == "CD1"){
-      gUiObject[sensor].updateD1(divid,val,"close");
     }
     if(chan == "V0"){
       if(val =='?'){
@@ -314,26 +308,36 @@ var relay = {
   },
   handSensorBtnEvt:function(key,divid){
     if(uiTemplateObj[divid].power == "on"){
-      var sensor = divid.substring(0,divid.indexOf('_'));
-
       switch(key){
-        case "K1"://控制D1.0,并立马上报
-          if(uiTemplateObj[divid].dlist[1].recent_val & 1){//已开
-            gUiObject[sensor].updateD1(divid,1,"close");
-          }
-          else{//已关
-            gUiObject[sensor].updateD1(divid,1,"open");
-          }
+        case "K1"://增加压力值、并立马上报
+          if((uiTemplateObj[divid].alist[0].recent_val+50) <= uiTemplateObj[divid].alist[0].data_policy.max_val){
 
+            uiTemplateObj[divid].alist[0].recent_val = parseFloat(uiTemplateObj[divid].alist[0].recent_val)+50;
+            var val = uiTemplateObj[divid].alist[0].recent_val;
+            $("#"+divid).find(".t_value").text(val);
+
+            var data = "";
+            var D0 = getD0Value(divid);
+            if(D0 == 1){
+              data = '{A0='+val+'}';
+              pushSensorData(uiTemplateObj[divid].mac,data);
+            }  
+          }
           break;
-        case "K2"://控制D1.1,并立马上报
-          if(uiTemplateObj[divid].dlist[1].recent_val & 2){//已开
-            gUiObject[sensor].updateD1(divid,2,"close");
-          }
-          else{//已关
-            gUiObject[sensor].updateD1(divid,2,"open");
-          }
+        case "K2"://减少压力值、并立马上报
+          if((uiTemplateObj[divid].alist[0].recent_val-50) >= uiTemplateObj[divid].alist[0].data_policy.min_val){
 
+            uiTemplateObj[divid].alist[0].recent_val = parseFloat(uiTemplateObj[divid].alist[0].recent_val)-50;
+            var val = uiTemplateObj[divid].alist[0].recent_val;
+            $("#"+divid).find(".t_value").text(val);
+
+            var data = "";
+            var D0 = getD0Value(divid);
+            if(D0 == 1){
+              data = '{A0='+val+'}';
+              pushSensorData(uiTemplateObj[divid].mac,data);
+            }
+          }
           break;
         default:
           break;
@@ -342,7 +346,7 @@ var relay = {
   }
 }
 
-function RelayUI(prop)
+function PressureUI(prop)
 {
 	this.properties = prop;
 	var html =  '<h3 class="title">'+
@@ -350,14 +354,14 @@ function RelayUI(prop)
                 '<div class="right">MAC地址：<span class="mac">'+prop.mac+'</span></div>'+
               '</h3>'+
               '<div class="body">'+
-                '<img class="img" src="images/sensor/relay00.jpg" alt="">'+
+                '<img class="img" src="images/sensor/pressure.jpg" alt="">'+
                 '<div class="button">'+
                   '<input class="power_switch btn-power" type="image" value="ON" src="images/power-off.png">'+
                   '<input class="btn-data btn_sensor" type="button" value="K1">'+
                   '<input class="btn-data btn_sensor" type="button" value="K2">'+
                 '</div>'+
                 '<div class="value">'+
-                  'D1值：<span class="t_value">0</span>&nbsp;&nbsp;'+
+                  '大气压力：<span class="t_value">0</span>Pa&nbsp;&nbsp;'+
                   'D0值:<span class="d0_value">1</span>&nbsp;&nbsp;V0值:<span class="v0_value">30</span>&nbsp;&nbsp;'+
                   '<span class="node_type">ZigBee</span>'+
                 '</div>'+
@@ -365,21 +369,8 @@ function RelayUI(prop)
 	$("#"+prop.tid).html(html);
   var str="";
 
-  //显示D1值
-  var D1 = prop.dlist[1].recent_val;
-  $("#"+prop.tid).find(".t_value").text(D1);
-  if(D1 == 1){
-    $("#"+prop.tid).find("img").attr("src","images/sensor/relay01.jpg");
-  }
-  if(D1 == 2){
-    $("#"+prop.tid).find("img").attr("src","images/sensor/relay02.jpg");
-  }
-  if(D1 == 3){
-    $("#"+prop.tid).find("img").attr("src","images/sensor/relay03.jpg");
-  }
-  if(D1 == 0){
-    $("#"+prop.tid).find("img").attr("src","images/sensor/relay00.jpg");
-  }
+  //显示压力值
+  $("#"+prop.tid).find(".t_value").text(prop.alist[0].recent_val);
 
   //显示V0相关的值
   $("#"+prop.tid).find(".v0_value").text(prop.vlist[0].val);

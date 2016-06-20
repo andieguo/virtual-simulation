@@ -5,6 +5,11 @@ var gUiObject = {
 	"relay":relay,
 	"alarm":alarm,
 	"infrared":infrared,
+	"airquality":airquality,
+	"pressure":pressure,
+	"acceleration":acceleration,
+	"flame":flame,
+	"combustibleGas":combustibleGas,
 	"customsensor":customsensor
 };
 /*恢复控件的UI内容*/

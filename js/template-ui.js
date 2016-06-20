@@ -273,6 +273,10 @@ $(document).ready(function() {
 		}
 	}
 	$("#estRows").html($("#estRows").html() + layoutContent);//布局类渲染
+	if(layoutContent != ""){
+		startdrag = 1;
+		stopsave = 1; 
+	}
 	$("#elmComponents").html(tabContent + $("#elmComponents").html());//组件类渲染
 
 

@@ -1,3 +1,4 @@
+/*通用传感器*/
 var customsensor = {
 
   html :  ' <div class="box box-element ui-draggable"> <a href="#close" class="remove label label-important"><i class="icon-remove icon-white"></i>删除</a> <span class="drag label"><i class="icon-move"></i>拖动</span>'+

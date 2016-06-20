@@ -42,6 +42,11 @@
 <script type="text/javascript" src="js/virt-hardware/relay.js"></script>
 <script type="text/javascript" src="js/virt-hardware/alarm.js"></script>
 <script type="text/javascript" src="js/virt-hardware/infrared.js"></script>
+<script type="text/javascript" src="js/virt-hardware/airquality.js"></script>
+<script type="text/javascript" src="js/virt-hardware/pressure.js"></script>
+<script type="text/javascript" src="js/virt-hardware/acceleration.js"></script>
+<script type="text/javascript" src="js/virt-hardware/flame.js"></script>
+<script type="text/javascript" src="js/virt-hardware/combustibleGas.js"></script>
 <script type="text/javascript" src="js/virt-hardware/customsensor.js"></script>
 
 <script type="text/javascript" src="js/layout-common.js"></script>
@@ -103,8 +108,14 @@ $(function(){
   initTemplateObj();
   initTemplateUI(sensor_prop,sensor_html);//传感器UI渲染
 
-  $("#bt_edithd").click(function(){
-    window.location.href="./edit.html";
+  $("#bt_edithd").click(function(){//编辑硬件
+    //编辑之前需要先关闭本地或者远程服务
+    if(localServiceTag || remoteServiceTag){
+      alert("请先关闭本地或远程服务！");
+    }
+    else{
+      window.location.href="./edit.html";
+    }
   });
 
   //本地服务点击事件
@@ -113,6 +124,10 @@ $(function(){
     if(cmd == "启动"){
       var zcloudId = $("#userId").val();
       var zcloudKey = $("#userKey").val();
+      if(zcloudId == "" || zcloudKey == ""){
+        alert("用户ID或密钥不能为空！");
+        return;
+      }
       startLocalWebsocket(zcloudId,zcloudKey);
       startLocalTCP(zcloudId,zcloudKey);
       localServiceTag = 1;
@@ -138,6 +153,16 @@ $(function(){
       var zcloudId = $("#userId").val();
       var zcloudKey = $("#userKey").val();
       var serverAddr = $("#serverAddr").val();
+
+      if(zcloudId == "" || zcloudKey == ""){
+        alert("用户ID或密钥不能为空！");
+        return;
+      }
+
+      if(serverAddr == ""){
+        alert("服务器地址不能为空！");
+        return;
+      }
       remoteTCP(zcloudId,zcloudKey,serverAddr);
       remoteServiceTag =1;
       $(this).val("关闭");
@@ -208,9 +233,9 @@ $(function(){
 <article class="container content">
 <form class="form-inline">
   <span>用户ID：</span>
-  <input type="text" id="userId" value="1155223953">
+  <input type="text" id="userId" value="">
   <span>用户密钥：</span>
-  <input type="text" id="userKey" value="Xrk6UicNrbo3KiX1tYDDaUq9HAMHBYhuE2Sb4NLKFKdNcLH5">
+  <input type="text" id="userKey" value="">
   <span>服务器地址：</span>
   <input type="text" id="serverAddr" value="zhiyun360.com">
   <br>

@@ -1,3 +1,4 @@
+/*人体红外传感器*/
 var infrared = {
 
   html :  ' <div class="box box-element ui-draggable"> <a href="#close" class="remove label label-important"><i class="icon-remove icon-white"></i>删除</a> <span class="drag label"><i class="icon-move"></i>拖动</span>'+
@@ -215,7 +216,7 @@ var infrared = {
     }
   },
 
-  updateD0:function(divid,val){//更新上报状态
+  updateD0:function(divid,val,cmd){//更新上报状态
     var D0 = getD0Value(divid);
     if(cmd == "open"){//OD0命令
       if((D0 & val) < val){//开启新通道的上传开关

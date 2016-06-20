@@ -1,24 +1,24 @@
-/*温湿度传感器*/
-var temphumi = {
+/*三轴传感器*/
+var acceleration = {
 
   html :  ' <div class="box box-element ui-draggable"> <a href="#close" class="remove label label-important"><i class="icon-remove icon-white"></i>删除</a> <span class="drag label"><i class="icon-move"></i>拖动</span>'+
                 '<span class="configuration"><button type="button" class="btn btn-mini" data-target="#attrEditorModal" role="button" data-toggle="modal">编辑</button></span>'+
-                 '<div class="preview">温湿度传感器</div>' +
+                 '<div class="preview">三轴加速度传感器</div>' +
                  '<div class="view">' +
-                    '<div class="panel-sensor" id="temphumi">'+
+                    '<div class="panel-sensor" id="acceleration">'+
                         '<h3 class="title">'+
-                          '温湿度传感器标题'+
+                          '三轴加速度传感器标题'+
                           '<div class="right">MAC地址：<span class="mac">11:22:33:44:55:66:77:88</span></div>'+
                         '</h3>'+
                         '<div class="body">'+
-                          '<img class="img" src="images/sensor/temphumi.jpg" alt="">'+
+                          '<img class="img" src="images/sensor/acceleration.jpg" alt="">'+
                           '<div class="button">'+
                             '<input class="power_switch btn-power" type="image" value="ON" src="images/power-off.png">'+
                             '<input class="btn-data btn_sensor" type="button" value="K1">'+
                             '<input class="btn-data btn_sensor" type="button" value="K2">'+
                           '</div>'+
                           '<div class="value">'+
-                            '温度：<span class="temp_value">0</span>℃&nbsp;&nbsp;湿度：<span class="humi_value">0</span>%&nbsp;&nbsp;'+
+                            'X：<span class="x_value">0</span>g&nbsp;&nbsp;Y：<span class="y_value">0</span>g&nbsp;&nbsp;Z：<span class="z_value">0</span>g&nbsp;&nbsp;'+
                             '上报开关:<span class="d0_value">30</span>&nbsp;&nbsp;上报间隔:<span class="v0_value">30</span>&nbsp;&nbsp;'+
                             '<span class="node_type">ZigBee</span>'+
                           '</div>'+
@@ -48,7 +48,7 @@ var temphumi = {
                       '</div><br>' + 
                       '<div class="input-prepend mr10p">' +
                         '<span class="add-on">通道</span>' +
-                        '<input class="w200p widgetAttrChange" id="sensor_mac" type="text" value="A0|A1" disabled="true ">' +
+                        '<input class="w200p widgetAttrChange" id="sensor_mac" type="text" value="A0|A1|A2" disabled="true ">' +
                       '</div>' + 
                       '<div class="input-prepend mr10p">' +
                         '<span class="add-on">D0设置</span>' +
@@ -56,7 +56,11 @@ var temphumi = {
                             '<option value="0">0</option>' +
                             '<option value="1">1</option>' +
                             '<option value="2">2</option>' +
-                            '<option value="3" selected="selected">3</option>' +
+                            '<option value="3">3</option>' +
+                            '<option value="4">4</option>' +
+                            '<option value="5">5</option>' +
+                            '<option value="6">6</option>' +
+                            '<option value="7" selected="selected">7</option>' +
                         '</select>' +
                       '</div>' +                  
                       '<div class="input-prepend mr10p var_v" chan="V0">' +
@@ -74,11 +78,11 @@ var temphumi = {
                         '</div>' + 
                         '<div class="input-prepend mr10p">' +
                           '<span class="add-on">最小值</span>' +
-                          '<input class="w50p widgetAttrChange min_value" value ="30" type="text">' +
+                          '<input class="w50p widgetAttrChange min_value" value ="-1" type="text">' +
                         '</div>' +
                         '<div class="input-prepend mr10p">' +
                           '<span class="add-on">最大值</span>' +
-                          '<input class="w50p widgetAttrChange max_value" value ="40" type="text">' +
+                          '<input class="w50p widgetAttrChange max_value" value ="20" type="text">' +
                         '</div>' + 
                       '</div>' +  
                       '<div class ="var_a" chan="A1">' +                  
@@ -92,27 +96,45 @@ var temphumi = {
                         '</div>' + 
                         '<div class="input-prepend mr10p">' +
                           '<span class="add-on">最小值</span>' +
-                          '<input class="w50p widgetAttrChange min_value" value ="50" type="text">' +
+                          '<input class="w50p widgetAttrChange min_value" value ="-1" type="text">' +
                         '</div>' +
                         '<div class="input-prepend mr10p">' +
                           '<span class="add-on">最大值</span>' +
-                          '<input class="w50p widgetAttrChange max_value" value ="60" type="text">' +
+                          '<input class="w50p widgetAttrChange max_value" value ="20" type="text">' +
+                        '</div>' + 
+                      '</div>' + 
+                      '<div class ="var_a" chan="A2">' +                  
+                        '<div class="input-prepend mr10p">' +
+                          '<span class="add-on">A2数据策略</span>' +
+                          '<select class="w100p widgetAttrChange data_policy">' +
+                              '<option value="data_random" selected="selected">随机数</option>' +
+                              '<option value="data_sin">正弦函数</option>' +
+                              '<option value="data_cos">余弦函数</option>' +
+                          '</select>' +
+                        '</div>' + 
+                        '<div class="input-prepend mr10p">' +
+                          '<span class="add-on">最小值</span>' +
+                          '<input class="w50p widgetAttrChange min_value" value ="-1" type="text">' +
+                        '</div>' +
+                        '<div class="input-prepend mr10p">' +
+                          '<span class="add-on">最大值</span>' +
+                          '<input class="w50p widgetAttrChange max_value" value ="20" type="text">' +
                         '</div>' + 
                       '</div>' +                           
                 ' </div>',
 
   create: function(){//默认情况下无参数，可接收控件属性参数对象create(properties)
     var properties = getSensorAttrModal();
-    properties.tid = "temphumi";
-    properties.title = "温湿度传感器";
+    properties.tid = "acceleration";
+    properties.title = "三轴加速度传感器";
     properties.mac = makeMacAddr("ZigBee");
     properties.alist = [
                           {
                               "var_name": "A0",
                               "recent_val": 0,
                               "data_policy": {
-                                  "min_val": 30,
-                                  "max_val": 40,
+                                  "min_val": -10,
+                                  "max_val": 20,
                                   "method": "data_random"
                               }
                           },
@@ -120,8 +142,17 @@ var temphumi = {
                               "var_name": "A1",
                               "recent_val": 0,
                               "data_policy": {
-                                  "min_val": 50,
-                                  "max_val": 60,
+                                  "min_val": -10,
+                                  "max_val": 20,
+                                  "method": "data_random"
+                              }
+                          },
+                          {
+                              "var_name": "A2",
+                              "recent_val": 0,
+                              "data_policy": {
+                                  "min_val": -10,
+                                  "max_val": 20,
                                   "method": "data_random"
                               }
                           }
@@ -129,8 +160,8 @@ var temphumi = {
     properties.dlist = [
                             {
                                 "var_name": "D0",
-                                "data_bit": 3,
-                                "recent_val": 3
+                                "data_bit": 7,
+                                "recent_val": 7
                             }
                         ];
     properties.vlist = [
@@ -152,7 +183,7 @@ var temphumi = {
       $.extend(properties,{"tid":n});
   }
     
-    var ui = new TempHumiUI(properties);
+    var ui = new AccelerationUI(properties);
     return ui;
   },
 
@@ -168,6 +199,10 @@ var temphumi = {
       $("[chan =A1]").find(".data_policy").find("option[value='"+properties.alist[1].data_policy.method+"']").attr("selected",true);
       $("[chan =A1]").find(".min_value").val(properties.alist[1].data_policy.min_val);
       $("[chan =A1]").find(".max_value").val(properties.alist[1].data_policy.max_val);
+      //变量A2显示
+      $("[chan =A2]").find(".data_policy").find("option[value='"+properties.alist[2].data_policy.method+"']").attr("selected",true);
+      $("[chan =A2]").find(".min_value").val(properties.alist[2].data_policy.min_val);
+      $("[chan =A2]").find(".max_value").val(properties.alist[2].data_policy.max_val);
       //变量V0显示
       $("[chan = V0]").find("input").val(properties.vlist[0].val);
       //变量D0显示
@@ -213,7 +248,7 @@ var temphumi = {
       properties.dlist.push(t);
 
       //console.log(properties);        
-      var ui = new TempHumiUI(properties);
+      var ui = new AccelerationUI(properties);
       return ui;
   },
 
@@ -230,8 +265,9 @@ var temphumi = {
           var t = makeSensorData(uiTemplateObj[divid].alist[i].data_policy,uiTemplateObj[divid].alist[i].recent_val);
 
           //传感器前端显示
-          if(uiTemplateObj[divid].alist[i].var_name == "A0") {$("#"+divid).find(".temp_value").text(t);}
-          else{$("#"+divid).find(".humi_value").text(t);}
+          if(uiTemplateObj[divid].alist[i].var_name == "A0") {$("#"+divid).find(".x_value").text(t);}
+          else if(uiTemplateObj[divid].alist[i].var_name == "A1"){$("#"+divid).find(".y_value").text(t);}
+          else{$("#"+divid).find(".z_value").text(t);}
 
           //临时保存
           uiTemplateObj[divid].alist[i].recent_val = t;
@@ -344,52 +380,67 @@ var temphumi = {
   handSensorBtnEvt:function(key,divid){
     if(uiTemplateObj[divid].power == "on"){
       switch(key){
-        case "K1"://增加温湿度值、并立马上报
+        case "K1"://增加三轴加速度值、并立马上报
           if((uiTemplateObj[divid].alist[0].recent_val+1) <= uiTemplateObj[divid].alist[0].data_policy.max_val
-            && (uiTemplateObj[divid].alist[1].recent_val+1) <= uiTemplateObj[divid].alist[1].data_policy.max_val){
+            && (uiTemplateObj[divid].alist[1].recent_val+1) <= uiTemplateObj[divid].alist[1].data_policy.max_val
+            && (uiTemplateObj[divid].alist[2].recent_val+1) <= uiTemplateObj[divid].alist[2].data_policy.max_val){
 
             uiTemplateObj[divid].alist[0].recent_val = parseFloat(uiTemplateObj[divid].alist[0].recent_val)+1;
             uiTemplateObj[divid].alist[1].recent_val = parseFloat(uiTemplateObj[divid].alist[1].recent_val)+1;
-            var temp = uiTemplateObj[divid].alist[0].recent_val;
-            var humi = uiTemplateObj[divid].alist[1].recent_val;
-            $("#"+divid).find(".temp_value").text(temp);
-            $("#"+divid).find(".humi_value").text(humi);
-
+            uiTemplateObj[divid].alist[2].recent_val = parseFloat(uiTemplateObj[divid].alist[2].recent_val)+1;
+            var x = uiTemplateObj[divid].alist[0].recent_val;
+            var y = uiTemplateObj[divid].alist[1].recent_val;
+            var z = uiTemplateObj[divid].alist[2].recent_val;
+            $("#"+divid).find(".x_value").text(x);
+            $("#"+divid).find(".y_value").text(y);
+            $("#"+divid).find(".z_value").text(z);
             var data = "";
             var D0 = getD0Value(divid);
-            if((D0&3) == 3){
-              data = '{A0='+temp+",A1="+humi+'}';
+            if((D0&7) == 7){
+              data = '{A0='+x+",A1="+y+",A2="+z+'}';
             }
-            if((D0&3) == 2) {
-              data = '{A1='+humi+'}';
+            if((D0&7) == 6){
+              data = '{A1='+y+",A2="+z+'}';
             }
-            if((D0&3) == 1) {
-              data = '{A0='+temp+'}';
+            if((D0&7) == 5){
+              data = '{A0='+x+",A2="+z+'}';
+            }
+            if((D0&7) == 4) {
+              data = '{A2='+z+'}';
+            }            
+            if((D0&7) == 3){
+              data = '{A0='+x+",A1="+y+'}';
+            }
+            if((D0&7) == 2) {
+              data = '{A1='+y+'}';
+            }
+            if((D0&7) == 1) {
+              data = '{A0='+x+'}';
             }
             pushSensorData(uiTemplateObj[divid].mac,data);
           }
           break;
-        case "K2"://减少温湿度值、并立马上报
+        case "K2"://减少三轴加速度值、并立马上报
           if((uiTemplateObj[divid].alist[0].recent_val-1) >= uiTemplateObj[divid].alist[0].data_policy.min_val
             && (uiTemplateObj[divid].alist[1].recent_val-1) >= uiTemplateObj[divid].alist[1].data_policy.min_val){
 
             uiTemplateObj[divid].alist[0].recent_val = parseFloat(uiTemplateObj[divid].alist[0].recent_val)-1;
             uiTemplateObj[divid].alist[1].recent_val = parseFloat(uiTemplateObj[divid].alist[1].recent_val)-1;
-            var temp = uiTemplateObj[divid].alist[0].recent_val;
-            var humi = uiTemplateObj[divid].alist[1].recent_val;
-            $("#"+divid).find(".temp_value").text(temp);
-            $("#"+divid).find(".humi_value").text(humi);
+            var x = uiTemplateObj[divid].alist[0].recent_val;
+            var y = uiTemplateObj[divid].alist[1].recent_val;
+            $("#"+divid).find(".x_value").text(x);
+            $("#"+divid).find(".y_value").text(y);
 
             var data = "";
             var D0 = getD0Value(divid);
             if((D0&3) == 3){
-              data = '{A0='+temp+",A1="+humi+'}';
+              data = '{A0='+x+",A1="+y+'}';
             }
             if((D0&3) == 2) {
-              data = '{A1='+humi+'}';
+              data = '{A1='+y+'}';
             }
             if((D0&3) == 1) {
-              data = '{A0='+temp+'}';
+              data = '{A0='+x+'}';
             }
             pushSensorData(uiTemplateObj[divid].mac,data);
           }
@@ -401,7 +452,7 @@ var temphumi = {
   }
 }
 
-function TempHumiUI(prop)
+function AccelerationUI(prop)
 {
 	this.properties = prop;
 	var html =  '<h3 class="title">'+
@@ -409,14 +460,14 @@ function TempHumiUI(prop)
                 '<div class="right">MAC地址：<span class="mac">'+prop.mac+'</span></div>'+
               '</h3>'+
               '<div class="body">'+
-                '<img class="img" src="images/sensor/temphumi.jpg" alt="">'+
+                '<img class="img" src="images/sensor/acceleration.jpg" alt="">'+
                 '<div class="button">'+
                   '<input class="power_switch btn-power" type="image" value="ON" src="images/power-off.png">'+
                   '<input class="btn-data btn_sensor" type="button" value="K1">'+
                   '<input class="btn-data btn_sensor" type="button" value="K2">'+
                 '</div>'+
                 '<div class="value">'+
-                  '温度：<span class="temp_value">0</span>℃&nbsp;&nbsp;湿度：<span class="humi_value">0</span>%&nbsp;&nbsp;'+
+                  'X：<span class="x_value">0</span>g&nbsp;&nbsp;y：<span class="y_value">0</span>g&nbsp;&nbsp;z：<span class="z_value">0</span>g&nbsp;&nbsp;'+
                   'D0值:<span class="d0_value">30</span>&nbsp;&nbsp;V0值:<span class="v0_value">30</span>&nbsp;&nbsp;'+
                   '<span class="node_type">ZigBee</span>'+
                 '</div>'+
@@ -424,10 +475,12 @@ function TempHumiUI(prop)
 	$("#"+prop.tid).html(html);
   var str="";
 
-  //显示温度值
-  $("#"+prop.tid).find(".temp_value").text(prop.alist[0].recent_val);
-  //显示湿度值
-  $("#"+prop.tid).find(".humi_value").text(prop.alist[1].recent_val);
+  //显示x值
+  $("#"+prop.tid).find(".x_value").text(prop.alist[0].recent_val);
+  //显示y值
+  $("#"+prop.tid).find(".y_value").text(prop.alist[1].recent_val);
+  //显示z值
+  $("#"+prop.tid).find(".z_value").text(prop.alist[2].recent_val);
 
   //显示V0相关的值
   $("#"+prop.tid).find(".v0_value").text(prop.vlist[0].val);
