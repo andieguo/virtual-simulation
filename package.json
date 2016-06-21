@@ -4,5 +4,9 @@
   "main": "main.html",
   "dependencies": {
     "websocket.io": "^0.2.1"
+  },
+  "window": {
+    "width": 1280,
+    "height": 800
   }
 }
